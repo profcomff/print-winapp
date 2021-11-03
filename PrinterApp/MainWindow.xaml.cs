@@ -21,6 +21,10 @@ namespace PrinterApp
             InitializeComponent();
             if (!Directory.Exists(SavePath))
                 Directory.CreateDirectory(SavePath);
+
+            if (40 + Height < SystemParameters.PrimaryScreenHeight)
+                Top = 40;
+            Left = SystemParameters.PrimaryScreenWidth - 20 - Width;
         }
 
         private const string FileUrl = "https://app.profcomff.com/print/file";
@@ -76,7 +80,12 @@ namespace PrinterApp
 
         private async void Print_OnClick(object sender, RoutedEventArgs e)
         {
-            if (Code.Text.Length < 1) return;
+            if (Code.Text.Length < 1)
+            {
+                ErrorBlock.Text = CodeError;
+                return;
+            }
+
             Debug.WriteLine("start");
             if (sender is Button button)
             {
@@ -158,6 +167,15 @@ namespace PrinterApp
             foreach (FileInfo file in new DirectoryInfo(SavePath).GetFiles())
             {
                 file.Delete();
+            }
+        }
+
+        private void MainWindow_OnClosed(object sender, EventArgs e)
+        {
+            if (Code.Text != "dyakov")
+            {
+                Process.Start(Application.ResourceAssembly.Location);
+                Application.Current.Shutdown();
             }
         }
     }
