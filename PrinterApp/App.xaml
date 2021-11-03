@@ -1,0 +1,11 @@
+﻿<Application x:Class="PrinterApp.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:PrinterApp"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+         <SolidColorBrush x:Key="Brush1" Color="#FF4086C2"></SolidColorBrush>
+         <SolidColorBrush x:Key="Brush2" Color="#FFC5DBED"></SolidColorBrush>
+         <SolidColorBrush x:Key="Brush3" Color="#FF2E6592"></SolidColorBrush>
+    </Application.Resources>
+</Application>
