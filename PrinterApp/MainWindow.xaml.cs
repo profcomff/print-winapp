@@ -109,7 +109,8 @@ namespace PrinterApp
                             Debug.WriteLine("end download");
                         }
                     }
-                    else if (response.StatusCode == HttpStatusCode.NotFound)
+                    else if (response.StatusCode == HttpStatusCode.NotFound ||
+                             response.StatusCode == HttpStatusCode.UnsupportedMediaType)
                     {
                         ErrorBlock.Text = CodeError;
                     }
