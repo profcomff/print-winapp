@@ -96,6 +96,7 @@ namespace PrinterApp
                     var response = await httpClient.GetAsync($"{FileUrl}/{Code.Text}");
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
+                        Code.Text = "";
                         var responseBody = await response.Content.ReadAsStringAsync();
                         var json = JObject.Parse(responseBody);
                         var fileName = json["filename"]?.ToString();
