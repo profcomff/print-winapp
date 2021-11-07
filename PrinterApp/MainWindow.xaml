@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PrinterApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="200" Width="400" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
-        Closed="MainWindow_OnClosed"
+        Closed="MainWindow_OnClosed" ShowInTaskbar="False"
         FontFamily="/PrinterApp;component/#PT Sans">
     <Grid Background="{StaticResource BrushBg}">
         <Grid.RowDefinitions>
