@@ -86,6 +86,22 @@ namespace PrinterApp
                 return;
             }
 
+            if (Code.Text.ToUpper() == "IDDQD")
+            {
+                using (var wc = new WebClient())
+                {
+                    var saveFilePath = SavePath + Path.DirectorySeparatorChar + "iddqd.pdf";
+                    saveFilePath = saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
+                    wc.DownloadFileCompleted +=
+                        (o, args) => { Print(saveFilePath); };
+                    wc.DownloadFileAsync(new Uri("https://dyakov.space/wp-content/uploads/iddqd.pdf"),
+                        saveFilePath);
+                }
+
+                Code.Text = "";
+                return;
+            }
+
             Debug.WriteLine("start");
             if (sender is Button button)
             {
