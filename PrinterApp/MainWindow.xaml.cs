@@ -18,6 +18,9 @@ namespace PrinterApp
     {
         public MainWindow()
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
+                                                   SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
             InitializeComponent();
             if (!Directory.Exists(SavePath))
                 Directory.CreateDirectory(SavePath);
@@ -29,7 +32,7 @@ namespace PrinterApp
 
         private const string FileUrl = "https://app.profcomff.com/print/file";
         private const string StaticUrl = "https://app.profcomff.com/print/static";
-        private const string CodeError = "Не корректный код";
+        private const string CodeError = "Некорректный код";
         private const string HttpError = "Ошибка сети";
 
         private static readonly string SavePath =
@@ -112,17 +115,26 @@ namespace PrinterApp
                     var response = await httpClient.GetAsync($"{FileUrl}/{Code.Text}");
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        Code.Text = "";
-                        var responseBody = await response.Content.ReadAsStringAsync();
-                        var json = JObject.Parse(responseBody);
-                        var fileName = json["filename"]?.ToString();
-                        Debug.WriteLine(json["filename"]);
-                        if (fileName?.Length > 0)
+                        try
                         {
-                            DeleteOldFiles();
-                            Debug.WriteLine("start download");
-                            Download(fileName);
-                            Debug.WriteLine("end download");
+                            Code.Text = "";
+                            var responseBody = await response.Content.ReadAsStringAsync();
+                            var json = JObject.Parse(responseBody);
+                            var fileName = json["filename"]?.ToString();
+                            Debug.WriteLine(json["filename"]);
+                            if (fileName?.Length > 0)
+                            {
+                                DeleteOldFiles();
+                                Debug.WriteLine("start download");
+                                Download(fileName);
+                                Debug.WriteLine("end download");
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            Debug.WriteLine(exception);
+                            Console.WriteLine(@"2 {0}", exception);
+                            ErrorBlock.Text = HttpError;
                         }
                     }
                     else if (response.StatusCode == HttpStatusCode.NotFound ||
@@ -134,6 +146,7 @@ namespace PrinterApp
                 catch (Exception exception)
                 {
                     Debug.WriteLine(exception);
+                    Console.WriteLine(@"1 {0}", exception);
                     ErrorBlock.Text = HttpError;
                 }
 
@@ -177,7 +190,7 @@ namespace PrinterApp
                 Verb = "print",
                 FileName = saveFilePath
             };
-            _currentProcess.Start();
+            var _ = _currentProcess.Start();
         }
 
         private static void DeleteOldFiles()
