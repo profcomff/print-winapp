@@ -18,9 +18,14 @@
                      DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False"
                      FontSize="26"
                      TextAlignment="Center" Padding="10" Background="{StaticResource Brush2}" />
-            <Button Grid.Row="1" Margin="30" Content="Печать" Click="Print_OnClick"
-                    Background="{StaticResource Brush2}"
-                    FontSize="24" IsDefault="True" />
+            <StackPanel Grid.Row="1" Margin="30" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button x:Name="Print1" Content="Печать" Click="Print_OnClick" Width="150"
+                        HorizontalContentAlignment="Center" Background="{StaticResource Brush2}" FontSize="17"
+                        IsDefault="True" />
+                <Button x:Name="Print2" Content="Печать с диалогом" Click="Print_OnClick" Width="150"
+                        HorizontalContentAlignment="Center" Background="{StaticResource Brush2}" FontSize="17"
+                        Margin="5,0,0,0" />
+            </StackPanel>
             <TextBlock x:Name="ErrorBlock" Grid.Row="1" Margin="30 0 30 70" FontSize="24" FontFamily="Source Sans Pro"
                        TextAlignment="Center" Foreground="DarkRed" />
             <ProgressBar x:Name="ProgressBar" Grid.Row="1" Margin="30" Visibility="Collapsed" />

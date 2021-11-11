@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -126,7 +125,7 @@ namespace PrinterApp
             Debug.WriteLine("start");
             if (sender is Button button)
             {
-                Code.IsEnabled = button.IsEnabled = false;
+                Code.IsEnabled = Print1.IsEnabled = Print2.IsEnabled = false;
                 var httpClient = new HttpClient();
                 try
                 {
@@ -144,7 +143,7 @@ namespace PrinterApp
                             {
                                 DeleteOldFiles();
                                 Debug.WriteLine("start download");
-                                Download(receiveOutput);
+                                Download(receiveOutput, button.Name == "Print2");
                                 Debug.WriteLine("end download");
                             }
                         }
@@ -168,13 +167,13 @@ namespace PrinterApp
                     ErrorBlock.Text = HttpError;
                 }
 
-                Code.IsEnabled = button.IsEnabled = true;
+                Code.IsEnabled = Print1.IsEnabled = Print2.IsEnabled = true;
             }
 
             Debug.WriteLine("end");
         }
 
-        private void Download(ReceiveOutput receiveOutput)
+        private void Download(ReceiveOutput receiveOutput, bool printDialog = false)
         {
             using (var wc = new WebClient())
             {
@@ -187,7 +186,7 @@ namespace PrinterApp
                     (sender, args) =>
                     {
                         ProgressBar.Visibility = Visibility.Collapsed;
-                        Print(saveFilePath, receiveOutput.Options);
+                        Print(saveFilePath, receiveOutput.Options, printDialog);
                     };
                 wc.DownloadFileAsync(new Uri($"{StaticUrl}/{receiveOutput.Filename}"),
                     saveFilePath);
@@ -199,32 +198,32 @@ namespace PrinterApp
             ProgressBar.Value = e.ProgressPercentage;
         }
 
-        private void Print(string saveFilePath, PrintOptions options)
+        private void Print(string saveFilePath, PrintOptions options, bool printDialog = false)
         {
-            var sumantraPath = SearchSumatraPdf();
-            if (sumantraPath != "")
+            var sumatraPath = SearchSumatraPdf();
+            if (sumatraPath != "")
             {
                 _currentProcess = new Process();
-                // _currentProcess.StartInfo = new ProcessStartInfo()
-                // {
-                //     CreateNoWindow = true,
-                //     Verb = "print",
-                //     FileName = saveFilePath
-                // };
-                var arguments =
-                    "-print-to-default -print-settings ";
-                arguments += "\"" + (options.TwoSided ? "duplexlong" : "simplex");
-                if (options.Pages != "")
+                var arguments = "-print-dialog";
+                if (!printDialog)
                 {
-                    arguments += $",{options.Pages}";
+                    arguments =
+                        "-print-to-default -print-settings ";
+                    arguments += "\"" + (options.TwoSided ? "duplexlong" : "simplex");
+                    if (options.Pages != "")
+                    {
+                        arguments += $",{options.Pages}";
+                    }
+
+                    if (options.Copies > 1)
+                    {
+                        arguments += $",{options.Copies}x";
+                    }
+
+                    arguments += "\"";
                 }
-                if (options.Copies > 1)
-                {
-                    arguments += $",{options.Copies}x";
-                }
-                arguments += ",2x";
-                arguments += "\"";
-                var startInfo = new ProcessStartInfo(sumantraPath)
+
+                var startInfo = new ProcessStartInfo(sumatraPath)
                 {
                     Arguments = $"{arguments} {saveFilePath}"
                 };
