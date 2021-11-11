@@ -5,21 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PrinterApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="200" Width="400" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
+        Title="MainWindow" Height="125" Width="250" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
         Closed="MainWindow_OnClosed" ShowInTaskbar="False"
         FontFamily="/PrinterApp;component/#PT Sans">
-    <Grid Background="{StaticResource BrushBg}">
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <TextBox x:Name="Code" Grid.Row="0" Margin="20" PreviewTextInput="TextBox_OnPreviewTextInput"
-                 DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False" FontSize="26"
-                 TextAlignment="Center" Padding="10" Background="{StaticResource Brush2}" />
-        <Button Grid.Row="1" Margin="30" Content="Печать" Click="Print_OnClick" Background="{StaticResource Brush2}"
-                FontSize="24" IsDefault="True"/>
-        <TextBlock x:Name="ErrorBlock" Grid.Row="1" Margin="30 0 30 70" FontSize="24" FontFamily="Source Sans Pro"
-                   TextAlignment="Center" Foreground="DarkRed" />
-        <ProgressBar x:Name="ProgressBar" Grid.Row="1" Margin="30" Visibility="Collapsed" />
-    </Grid>
+    <Viewbox>
+        <Grid Background="{StaticResource BrushBg}" Height="200" Width="400">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBox x:Name="Code" Grid.Row="0" Margin="20" PreviewTextInput="TextBox_OnPreviewTextInput"
+                     DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False"
+                     FontSize="26"
+                     TextAlignment="Center" Padding="10" Background="{StaticResource Brush2}" />
+            <Button Grid.Row="1" Margin="30" Content="Печать" Click="Print_OnClick"
+                    Background="{StaticResource Brush2}"
+                    FontSize="24" IsDefault="True" />
+            <TextBlock x:Name="ErrorBlock" Grid.Row="1" Margin="30 0 30 70" FontSize="24" FontFamily="Source Sans Pro"
+                       TextAlignment="Center" Foreground="DarkRed" />
+            <ProgressBar x:Name="ProgressBar" Grid.Row="1" Margin="30" Visibility="Collapsed" />
+        </Grid>
+    </Viewbox>
 </Window>

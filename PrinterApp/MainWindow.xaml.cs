@@ -3,11 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace PrinterApp
 {
@@ -18,8 +19,9 @@ namespace PrinterApp
     {
         public MainWindow()
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
-                                                   SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol =
+                SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
+                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
             InitializeComponent();
             if (!Directory.Exists(SavePath))
@@ -28,6 +30,12 @@ namespace PrinterApp
             if (40 + Height < SystemParameters.PrimaryScreenHeight)
                 Top = 40;
             Left = SystemParameters.PrimaryScreenWidth - 20 - Width;
+
+            if (SearchSumatraPdf() == "")
+            {
+                MessageBox.Show(SumatraError);
+                throw new Exception();
+            }
         }
 
         private const string FileUrl = "https://app.profcomff.com/print/file";
@@ -35,11 +43,19 @@ namespace PrinterApp
         private const string CodeError = "Некорректный код";
         private const string HttpError = "Ошибка сети";
 
+        private const string SumatraError =
+            "[Error] program SumatraPdf is not found\ninform the responsible person\n\n[Ошибка] программа SumatraPdf не найдена\nсообщите ответственному лицу";
+
         private static readonly string SavePath =
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + Path.DirectorySeparatorChar +
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
+            Path.DirectorySeparatorChar +
             ".printerApp";
 
         private static readonly Regex Regex = new Regex("[a-zA-Z0-9]{0,6}");
+
+        private static readonly string SumatraPathSuffix =
+            Path.DirectorySeparatorChar + "SumatraPDF" +
+            Path.DirectorySeparatorChar + "SumatraPDF.exe";
 
         private Process _currentProcess;
 
@@ -94,10 +110,12 @@ namespace PrinterApp
                 using (var wc = new WebClient())
                 {
                     var saveFilePath = SavePath + Path.DirectorySeparatorChar + "iddqd.pdf";
-                    saveFilePath = saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
+                    saveFilePath =
+                        saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
                     wc.DownloadFileCompleted +=
-                        (o, args) => { Print(saveFilePath); };
-                    wc.DownloadFileAsync(new Uri("https://dyakov.space/wp-content/uploads/iddqd.pdf"),
+                        (o, args) => { Print(saveFilePath, new PrintOptions("", 1, false)); };
+                    wc.DownloadFileAsync(
+                        new Uri("https://dyakov.space/wp-content/uploads/iddqd.pdf"),
                         saveFilePath);
                 }
 
@@ -119,14 +137,14 @@ namespace PrinterApp
                         {
                             Code.Text = "";
                             var responseBody = await response.Content.ReadAsStringAsync();
-                            var json = JObject.Parse(responseBody);
-                            var fileName = json["filename"]?.ToString();
-                            Debug.WriteLine(json["filename"]);
-                            if (fileName?.Length > 0)
+                            //ReceiveOutput
+                            var receiveOutput =
+                                JsonConvert.DeserializeObject<ReceiveOutput>(responseBody);
+                            if (receiveOutput?.Filename.Length > 0)
                             {
                                 DeleteOldFiles();
                                 Debug.WriteLine("start download");
-                                Download(fileName);
+                                Download(receiveOutput);
                                 Debug.WriteLine("end download");
                             }
                         }
@@ -156,7 +174,7 @@ namespace PrinterApp
             Debug.WriteLine("end");
         }
 
-        private void Download(string filename)
+        private void Download(ReceiveOutput receiveOutput)
         {
             using (var wc = new WebClient())
             {
@@ -169,9 +187,9 @@ namespace PrinterApp
                     (sender, args) =>
                     {
                         ProgressBar.Visibility = Visibility.Collapsed;
-                        Print(saveFilePath);
+                        Print(saveFilePath, receiveOutput.Options);
                     };
-                wc.DownloadFileAsync(new Uri($"{StaticUrl}/{filename}"),
+                wc.DownloadFileAsync(new Uri($"{StaticUrl}/{receiveOutput.Filename}"),
                     saveFilePath);
             }
         }
@@ -181,16 +199,43 @@ namespace PrinterApp
             ProgressBar.Value = e.ProgressPercentage;
         }
 
-        private void Print(string saveFilePath)
+        private void Print(string saveFilePath, PrintOptions options)
         {
-            _currentProcess = new Process();
-            _currentProcess.StartInfo = new ProcessStartInfo()
+            var sumantraPath = SearchSumatraPdf();
+            if (sumantraPath != "")
             {
-                CreateNoWindow = true,
-                Verb = "print",
-                FileName = saveFilePath
-            };
-            var _ = _currentProcess.Start();
+                _currentProcess = new Process();
+                // _currentProcess.StartInfo = new ProcessStartInfo()
+                // {
+                //     CreateNoWindow = true,
+                //     Verb = "print",
+                //     FileName = saveFilePath
+                // };
+                var arguments =
+                    "-print-to-default -print-settings ";
+                arguments += "\"" + (options.TwoSided ? "duplexlong" : "simplex");
+                if (options.Pages != "")
+                {
+                    arguments += $",{options.Pages}";
+                }
+                if (options.Copies > 1)
+                {
+                    arguments += $",{options.Copies}x";
+                }
+                arguments += ",2x";
+                arguments += "\"";
+                var startInfo = new ProcessStartInfo(sumantraPath)
+                {
+                    Arguments = $"{arguments} {saveFilePath}"
+                };
+                _currentProcess.StartInfo = startInfo;
+                var _ = _currentProcess.Start();
+            }
+            else
+            {
+                MessageBox.Show(SumatraError);
+                throw new Exception();
+            }
         }
 
         private static void DeleteOldFiles()
@@ -199,6 +244,28 @@ namespace PrinterApp
             {
                 file.Delete();
             }
+        }
+
+        private static string SearchSumatraPdf()
+        {
+            var path =
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
+                SumatraPathSuffix;
+            if (File.Exists(path))
+                return path;
+            path = Directory.GetCurrentDirectory() + SumatraPathSuffix;
+            if (File.Exists(path))
+                return path;
+            path = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "SumatraPDF.exe";
+            if (File.Exists(path))
+                return path;
+            path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) +
+                   SumatraPathSuffix;
+            if (File.Exists(path))
+                return path;
+            path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) +
+                   SumatraPathSuffix;
+            return File.Exists(path) ? path : "";
         }
 
         private void MainWindow_OnClosed(object sender, EventArgs e)
