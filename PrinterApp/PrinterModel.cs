@@ -12,8 +12,8 @@ namespace PrinterApp
 {
     public class PrinterModel
     {
-        private const string FileUrl = "https://printer.api.profcomff.com/print/file";
-        private const string StaticUrl = "https://printer.api.profcomff.com/print/static";
+        private const string FileUrl = "https://printer.api.profcomff.com/file";
+        private const string StaticUrl = "https://printer.api.profcomff.com/static";
         private const string CodeError = "Некорректный код";
         private const string HttpError = "Ошибка сети";
 
@@ -75,6 +75,7 @@ namespace PrinterApp
         {
             if (PrinterViewModel.CodeTextBoxText.Length < 1)
             {
+                PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
                 PrinterViewModel.ErrorTextBlockText = CodeError;
                 return;
             }
@@ -99,7 +100,7 @@ namespace PrinterApp
             }
 
             Log.Debug($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Start response code {PrinterViewModel.CodeTextBoxText}");
-            PrinterViewModel.TextBlockEnabled = false;
+            PrinterViewModel.DownloadNotInProgress = false;
             var httpClient = new HttpClient();
             try
             {
@@ -122,22 +123,25 @@ namespace PrinterApp
                     catch (Exception exception)
                     {
                         Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
+                        PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
                         PrinterViewModel.ErrorTextBlockText = HttpError;
                     }
                 }
                 else if (response.StatusCode == HttpStatusCode.NotFound ||
                          response.StatusCode == HttpStatusCode.UnsupportedMediaType)
                 {
+                    PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
                     PrinterViewModel.ErrorTextBlockText = CodeError;
                 }
             }
             catch (Exception exception)
             {
                 Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
+                PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
                 PrinterViewModel.ErrorTextBlockText = HttpError;
             }
 
-            PrinterViewModel.TextBlockEnabled = true;
+            PrinterViewModel.DownloadNotInProgress = true;
 
             Log.Debug($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: End response code {PrinterViewModel.CodeTextBoxText}");
         }

@@ -2,11 +2,12 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:PrinterApp"
-             StartupUri="MainWindow.xaml">
+             Startup="App_OnStartup" >
     <Application.Resources>
-        <SolidColorBrush x:Key="Brush1" Color="#FF4086C2" />
-        <SolidColorBrush x:Key="Brush2" Color="#FFC5DBED" />
-        <SolidColorBrush x:Key="Brush3" Color="#FF2E6592" />
-        <ImageBrush x:Key="BrushBg" ImageSource="Images/bg.png" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -5,32 +5,104 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PrinterApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="125" Width="250" WindowStyle="None" ResizeMode="NoResize" Topmost="True"
-        Closed="MainWindow_OnClosed" ShowInTaskbar="False"
-        FontFamily="/PrinterApp;component/Fonts/#PT Sans"
+        Title="PrintApp" Height="900" Width="1600"
+        Closed="MainWindow_OnClosed"
+        FontFamily="/PrinterApp;component/Fonts/#Roboto"
+        WindowState="Maximized"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Topmost="True"
+        ShowInTaskbar="False"
         d:DataContext="{d:DesignInstance local:PrinterViewModel}">
-    <Viewbox>
-        <Grid Background="{StaticResource BrushBg}" Height="200" Width="400">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <TextBox x:Name="Code" Grid.Row="0" Margin="20" PreviewTextInput="TextBox_OnPreviewTextInput"
-                     DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False"
-                     FontSize="26" Text="{Binding CodeTextBoxText, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding TextBlockEnabled}"
-                     TextAlignment="Center" Padding="10" Background="{StaticResource Brush2}" />
-            <StackPanel Grid.Row="1" Margin="30" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button x:Name="Print1" Content="Печать" Click="Print_OnClick" Width="150"
-                        HorizontalContentAlignment="Center" Background="{StaticResource Brush2}" FontSize="17"
-                        IsDefault="True" IsEnabled="{Binding TextBlockEnabled}" />
-                <Button x:Name="Print2" Content="Печать с диалогом" Click="Print_OnClick" Width="150"
-                        HorizontalContentAlignment="Center" Background="{StaticResource Brush2}" FontSize="17"
-                        Margin="5,0,0,0" IsEnabled="{Binding TextBlockEnabled}" />
-            </StackPanel>
-            <TextBlock x:Name="ErrorBlock" Grid.Row="1" Margin="30 0 30 70" FontSize="24" FontFamily="Source Sans Pro"
-                       TextAlignment="Center" Foreground="DarkRed" Text="{Binding ErrorTextBlockText}" />
-            <ProgressBar x:Name="ProgressBar" Grid.Row="1" Margin="30"
-                         Visibility="{Binding ProgressBarVisibility}" Value="{Binding ProgressBarValue}" />
-        </Grid>
+    <Viewbox Stretch="Fill">
+        <Canvas Background="{DynamicResource App.Background}" Height="900" Width="1600">
+            <Rectangle Width="3" Height="590" Canvas.Left="684" Canvas.Top="155"
+                       Fill="{DynamicResource Labels.Foreground}" />
+            <TextBlock FontSize="24" Width="641" Height="449" Canvas.Left="814" Canvas.Top="57" TextWrapping="Wrap"
+                       Foreground="{DynamicResource Labels.Foreground}" FontFamily="Roboto" FontWeight="Bold">
+                <Run
+                    Text="0) Подключись со своего устройства к интернету. Можно воспользоваться сетями Wi-Fi в холле ЦФА или гостевым Wi-Fi PKFF_Free. " />
+                <LineBreak />
+                <Run
+                    Text="1) Перейди по ссылке и авторизуйся по фамилии и номеру профсоюзго билета (смотри карту Zachet или в личном кабинете https://lk.msuprof.com/login) " />
+                <LineBreak /><Run Text="2) Выбери и прикрепи файл. " /><LineBreak />
+                <Run Text="3) Получи комбинацию цифр для печати документа. " /><LineBreak />
+                <Run Text="4) Введи комбинацию в окно ввода на компьютере бесплатного принтера" />
+            </TextBlock>
+            <TextBlock Text="Приложение Твой ФФ!" FontSize="24" Width="256" Height="28" Canvas.Left="854"
+                       Canvas.Top="540" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
+                       FontWeight="Bold" />
+            <TextBlock Text="Бот принтера ВК" FontSize="24" Width="189" Height="28" Canvas.Left="1208" Canvas.Top="540"
+                       TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold" />
+            <TextBlock Text="app.profcomff.com" FontSize="24" Width="209" Height="28" Canvas.Left="878"
+                       Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
+                       FontWeight="Bold" />
+            <TextBlock Text="vk.me/profcomff_print" FontSize="24" Width="244" Height="28" Canvas.Left="1181"
+                       Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
+                       FontWeight="Bold" />
+            <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.AppProfcomffCom}" Canvas.Left="876"
+                       Canvas.Top="591" HorizontalAlignment="Center" VerticalAlignment="Top" />
+            <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.ProfcomffPrint}" Canvas.Left="1197"
+                       Canvas.Top="591" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <Grid Height="289" Canvas.Left="82" Canvas.Top="301" Width="410">
+                <TextBlock Text="Код документа для печати" FontSize="24" TextWrapping="Wrap"
+                           Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold" Margin="0,0,104,261" />
+                <TextBox PreviewTextInput="TextBox_OnPreviewTextInput" BorderBrush="Red" BorderThickness="0"
+                         DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False"
+                         FontSize="24"
+                         Text="{Binding CodeTextBoxText, FallbackValue=123, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         IsEnabled="{Binding DownloadNotInProgress}"
+                         TextAlignment="Center" Background="{DynamicResource TextBox.Background}"
+                         Foreground="{DynamicResource TextBox.Foreground}" VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Center" Margin="0,29,0,208" />
+                <Label FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                       Background="Red" Foreground="White" Content="{Binding ErrorTextBlockText, FallbackValue=123}"
+                       Padding="0,0,0,0" Margin="0,97,0,162" Visibility="{Binding ErrorTextBlockVisibility}" />
+                <Button Content="Распечатать сразу" Click="Print_OnClick"
+                        Style="{DynamicResource MyButtonStyle}" FontSize="20"
+                        IsEnabled="{Binding DownloadNotInProgress}" Margin="0,161,0,76" />
+                <Button Content="Изменить настройки и распечатать" Click="Print_OnClick"
+                        Style="{DynamicResource MyButtonStyle}" FontSize="20"
+                        IsEnabled="False" Margin="0,237,0,0" Visibility="Collapsed" />
+                <ProgressBar Visibility="{Binding ProgressBarVisibility}"
+                             Value="{Binding ProgressBarValue, FallbackValue=20}" Background="#FFD9D9D9"
+                             Foreground="#FF8B00" Margin="0,97,0,162" />
+            </Grid>
+            <Grid Height="374" Canvas.Left="82" Canvas.Top="273" Width="410" Visibility="Collapsed" d:IsHidden="True">
+                <TextBlock Text="Страницы" FontSize="24" TextWrapping="Wrap"
+                           Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold" Margin="0,0,292,346" />
+                <TextBox Style="{DynamicResource MyTextBoxStyle}" PreviewTextInput="TextBox_OnPreviewTextInput"
+                         BorderBrush="Red" BorderThickness="4"
+                         DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False"
+                         FontSize="24"
+                         Text="{Binding CodeTextBoxText, FallbackValue=123, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         IsEnabled="{Binding DownloadNotInProgress}"
+                         TextAlignment="Left" Background="{DynamicResource TextBox.Background}"
+                         Foreground="{DynamicResource TextBox.Foreground}" VerticalContentAlignment="Center"
+                         Margin="0,30,0,292" />
+                <TextBlock Text="Количество копий" FontSize="24" TextWrapping="Wrap"
+                           Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold" Margin="0,106,202,240" />
+                <TextBox PreviewTextInput="TextBox_OnPreviewTextInput" BorderBrush="Red" BorderThickness="4"
+                         DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False"
+                         FontSize="24"
+                         Text="{Binding CodeTextBoxText, FallbackValue=123, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         IsEnabled="{Binding DownloadNotInProgress}"
+                         TextAlignment="Left" Background="{DynamicResource TextBox.Background}"
+                         Foreground="{DynamicResource TextBox.Foreground}" VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Left" Margin="0,134,0,188" />
+                <CheckBox Style="{DynamicResource MyCheckBoxStyle}" FontSize="24" FontWeight="Bold"
+                          Content="Печатать с обеих сторон листа" Foreground="White" Padding="0,0,0,0"
+                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                          UseLayoutRounding="True" IsChecked="True" Margin="0,210,0,132" />
+                <Label FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                       Background="Red" Foreground="White" Content="{Binding ErrorTextBlockText, FallbackValue=123}"
+                       Padding="0,0,0,0" Margin="0,259,0,85" />
+                <ProgressBar Value="{Binding ProgressBarValue, FallbackValue=20}" Background="#FFD9D9D9"
+                             Foreground="#FF8B00" Margin="0,259,0,85" />
+                <Button Style="{DynamicResource MyButtonStyle}" Content="Распечатать" Click="ManualPrint_OnClick"
+                        Foreground="{DynamicResource Button.Foreground}" FontSize="20"
+                        IsDefault="True" IsEnabled="{Binding DownloadNotInProgress}" Margin="0,322,0,0" />
+            </Grid>
+        </Canvas>
     </Viewbox>
 </Window>

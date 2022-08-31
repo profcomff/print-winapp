@@ -4,19 +4,20 @@ namespace PrinterApp
 {
     public class PrinterViewModel : NotifyPropertyChangeBase
     {
-        private bool _textBlockEnabled = true;
+        private bool _downloadNotInProgress = true;
         private string _codeTextBoxText = "";
         private string _errorTextBlockText = "";
+        private Visibility _errorTextBlockVisibility = Visibility.Collapsed;
         private double _progressBarValue;
         private Visibility _progressBarVisibility = Visibility.Collapsed;
 
-        public bool TextBlockEnabled
+        public bool DownloadNotInProgress
         {
-            get => _textBlockEnabled;
+            get => _downloadNotInProgress;
             set
             {
-                if (value == _textBlockEnabled) return;
-                _textBlockEnabled = value;
+                if (value == _downloadNotInProgress) return;
+                _downloadNotInProgress = value;
                 OnPropertyChanged();
             }
         }
@@ -61,6 +62,17 @@ namespace PrinterApp
             {
                 if (value == _progressBarVisibility) return;
                 _progressBarVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility ErrorTextBlockVisibility
+        {
+            get => _errorTextBlockVisibility;
+            set
+            {
+                if (value == _errorTextBlockVisibility) return;
+                _errorTextBlockVisibility = value;
                 OnPropertyChanged();
             }
         }
