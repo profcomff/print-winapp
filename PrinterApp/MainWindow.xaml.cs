@@ -15,16 +15,12 @@ namespace PrinterApp
     public partial class MainWindow : Window
     {
         private readonly PrinterModel _printerModel = new PrinterModel();
-        private readonly Regex _regex = new Regex("[a-zA-Z0-9]{0,6}");
+        private readonly Regex _regex = new Regex("[a-zA-Z0-9]{0,8}");
 
         public MainWindow()
         {
-            var fileName = GetType().Namespace;
-            Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
-                .WriteTo.Console()
-                .WriteTo.File($"logs/{fileName}.txt", rollingInterval: RollingInterval.Day)
-                .CreateLogger();
-
+            Loaded += (sender, e) =>
+                MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
             DataContext = _printerModel.PrinterViewModel;
             InitializeComponent();
             if (40 + Height < SystemParameters.PrimaryScreenHeight)
@@ -41,7 +37,11 @@ namespace PrinterApp
         private void TextBox_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             if (_printerModel.PrinterViewModel.ErrorTextBlockText != "")
+            {
+                _printerModel.PrinterViewModel.ErrorTextBlockVisibility = Visibility.Collapsed;
                 _printerModel.PrinterViewModel.ErrorTextBlockText = "";
+            }
+
             e.Handled = !IsTextAllowed((sender as TextBox)?.Text + e.Text);
         }
 
@@ -66,7 +66,10 @@ namespace PrinterApp
             if (e.Key == Key.Back)
             {
                 if (_printerModel.PrinterViewModel.ErrorTextBlockText != "")
+                {
+                    _printerModel.PrinterViewModel.ErrorTextBlockVisibility = Visibility.Collapsed;
                     _printerModel.PrinterViewModel.ErrorTextBlockText = "";
+                }
             }
         }
 
@@ -87,6 +90,10 @@ namespace PrinterApp
                 Process.Start(Application.ResourceAssembly.Location);
                 Application.Current.Shutdown();
             }
+        }
+
+        private void ManualPrint_OnClick(object sender, RoutedEventArgs e)
+        {
         }
     }
 }
