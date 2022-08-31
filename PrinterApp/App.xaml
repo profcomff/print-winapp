@@ -7,6 +7,6 @@
         <SolidColorBrush x:Key="Brush1" Color="#FF4086C2" />
         <SolidColorBrush x:Key="Brush2" Color="#FFC5DBED" />
         <SolidColorBrush x:Key="Brush3" Color="#FF2E6592" />
-        <ImageBrush x:Key="BrushBg" ImageSource="bg.png" />
+        <ImageBrush x:Key="BrushBg" ImageSource="Images/bg.png" />
     </Application.Resources>
 </Application>
