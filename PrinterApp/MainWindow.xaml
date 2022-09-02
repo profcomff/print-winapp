@@ -47,13 +47,25 @@
             <Grid Height="289" Canvas.Left="82" Canvas.Top="301" Width="410">
                 <TextBlock Text="Код документа для печати" FontSize="24" TextWrapping="Wrap"
                            Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold" Margin="0,0,104,261" />
-                <TextBox PreviewTextInput="TextBox_OnPreviewTextInput"
+                <TextBox x:Name="CodeBox" PreviewTextInput="TextBox_OnPreviewTextInput"
                          DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False"
                          FontSize="24"
-                         Text="{Binding CodeTextBoxText, FallbackValue=123, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding CodeTextBoxText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          IsEnabled="{Binding DownloadNotInProgress}"
                          TextAlignment="Center" Style="{DynamicResource MyTextBoxStyle1}" VerticalContentAlignment="Center"
                          HorizontalContentAlignment="Center" Margin="0,29,0,208" />
+                <TextBlock IsHitTestVisible="False" Text="Введите код здесь" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,41,0,0" Foreground="DarkGray" FontSize="24">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=CodeBox}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
                 <Label x:Name="ErrorLine1" FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                        Background="Red" Foreground="White" Content="{Binding ErrorTextBlockText, FallbackValue=123}"
                        Padding="0,0,0,0" Margin="0,97,0,162" Visibility="{Binding ErrorTextBlockVisibility}" />
