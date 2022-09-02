@@ -76,8 +76,8 @@
                         Style="{DynamicResource MyButtonStyle}" FontSize="20"
                         IsEnabled="False" Margin="0,237,0,0" Visibility="Collapsed" />
                 <ProgressBar Visibility="{Binding ProgressBarVisibility}"
-                             Value="{Binding ProgressBarValue, FallbackValue=20}" Background="#FFD9D9D9"
-                             Foreground="#FF8B00" Margin="0,97,0,162" />
+                             Value="{Binding ProgressBarValue, FallbackValue=20}" Background="{DynamicResource ProgressBar.Background}"
+                             Foreground="{DynamicResource ProgressBar.Foreground}" Margin="0,97,0,162" />
             </Grid>
             <Grid Height="374" Canvas.Left="82" Canvas.Top="273" Width="410" Visibility="Collapsed" d:IsHidden="True">
                 <TextBlock Text="Страницы" FontSize="24" TextWrapping="Wrap"
@@ -105,11 +105,10 @@
                 <Label x:Name="ErrorLine2" FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                        Background="Red" Foreground="White" Content="{Binding ErrorTextBlockText, FallbackValue=123}"
                        Padding="0,0,0,0" Margin="0,259,0,85" />
-                <ProgressBar Value="{Binding ProgressBarValue, FallbackValue=20}" Background="#FFD9D9D9"
-                             Foreground="#FF8B00" Margin="0,259,0,85" />
+                <ProgressBar Value="{Binding ProgressBarValue, FallbackValue=20}" Background="{DynamicResource ProgressBar.Background}"
+                             Foreground="{DynamicResource ProgressBar.Foreground}" Margin="0,259,0,85" />
                 <Button Style="{DynamicResource MyButtonStyle}" Content="Распечатать" Click="ManualPrint_OnClick"
-                        Foreground="{DynamicResource Button.Foreground}" FontSize="20"
-                        IsDefault="True" IsEnabled="{Binding DownloadNotInProgress}" Margin="0,322,0,0" />
+                        FontSize="20" IsDefault="True" IsEnabled="{Binding DownloadNotInProgress}" Margin="0,322,0,0" />
             </Grid>
         </Canvas>
     </Viewbox>

@@ -4,11 +4,9 @@
     <ImageBrush x:Key="Qr.AppProfcomffCom" ImageSource="Images/app.profcomff.com.png" />
     <ImageBrush x:Key="Qr.ProfcomffPrint" ImageSource="Images/profcomff_print.png" />
 
-    <SolidColorBrush x:Key="Button.Background" Color="#FFFF8B00" />
-    <SolidColorBrush x:Key="Button.Foreground" Color="#FF000000" />
-    <SolidColorBrush x:Key="TextBox.Background" Color="#FFD9D9D9" />
-    <SolidColorBrush x:Key="TextBox.Foreground" Color="#FF000000" />
     <SolidColorBrush x:Key="Labels.Foreground" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="ProgressBar.Background" Color="#FFD9D9D9" />
+    <SolidColorBrush x:Key="ProgressBar.Foreground" Color="#FF8B00" />
 
 
     <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3" />
