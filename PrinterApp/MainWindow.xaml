@@ -47,15 +47,26 @@
             <Grid Height="289" Canvas.Left="82" Canvas.Top="301" Width="410">
                 <TextBlock Text="Код документа для печати" FontSize="24" TextWrapping="Wrap"
                            Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold" Margin="0,0,104,261" />
-                <TextBox PreviewTextInput="TextBox_OnPreviewTextInput" BorderBrush="Red" BorderThickness="0"
+                <TextBox x:Name="CodeBox" PreviewTextInput="TextBox_OnPreviewTextInput"
                          DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False"
                          FontSize="24"
-                         Text="{Binding CodeTextBoxText, FallbackValue=123, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding CodeTextBoxText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          IsEnabled="{Binding DownloadNotInProgress}"
-                         TextAlignment="Center" Background="{DynamicResource TextBox.Background}"
-                         Foreground="{DynamicResource TextBox.Foreground}" VerticalContentAlignment="Center"
+                         TextAlignment="Center" Style="{DynamicResource MyTextBoxStyle1}" VerticalContentAlignment="Center"
                          HorizontalContentAlignment="Center" Margin="0,29,0,208" />
-                <Label FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                <TextBlock IsHitTestVisible="False" Text="Введите код здесь" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,41,0,0" Foreground="DarkGray" FontSize="24">
+                    <TextBlock.Style>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=CodeBox}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <Label x:Name="ErrorLine1" FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                        Background="Red" Foreground="White" Content="{Binding ErrorTextBlockText, FallbackValue=123}"
                        Padding="0,0,0,0" Margin="0,97,0,162" Visibility="{Binding ErrorTextBlockVisibility}" />
                 <Button Content="Распечатать сразу" Click="Print_OnClick"
@@ -65,43 +76,39 @@
                         Style="{DynamicResource MyButtonStyle}" FontSize="20"
                         IsEnabled="False" Margin="0,237,0,0" Visibility="Collapsed" />
                 <ProgressBar Visibility="{Binding ProgressBarVisibility}"
-                             Value="{Binding ProgressBarValue, FallbackValue=20}" Background="#FFD9D9D9"
-                             Foreground="#FF8B00" Margin="0,97,0,162" />
+                             Value="{Binding ProgressBarValue, FallbackValue=20}" Background="{DynamicResource ProgressBar.Background}"
+                             Foreground="{DynamicResource ProgressBar.Foreground}" Margin="0,97,0,162" />
             </Grid>
             <Grid Height="374" Canvas.Left="82" Canvas.Top="273" Width="410" Visibility="Collapsed" d:IsHidden="True">
                 <TextBlock Text="Страницы" FontSize="24" TextWrapping="Wrap"
                            Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold" Margin="0,0,292,346" />
-                <TextBox Style="{DynamicResource MyTextBoxStyle}" PreviewTextInput="TextBox_OnPreviewTextInput"
-                         BorderBrush="Red" BorderThickness="4"
+                <TextBox PreviewTextInput="TextBox_OnPreviewTextInput"
                          DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False"
-                         FontSize="24"
+                         FontSize="24" Style="{DynamicResource MyTextBoxStyle2}"
                          Text="{Binding CodeTextBoxText, FallbackValue=123, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          IsEnabled="{Binding DownloadNotInProgress}"
-                         TextAlignment="Left" Background="{DynamicResource TextBox.Background}"
-                         Foreground="{DynamicResource TextBox.Foreground}" VerticalContentAlignment="Center"
+                         TextAlignment="Left"  VerticalContentAlignment="Center"
                          Margin="0,30,0,292" />
                 <TextBlock Text="Количество копий" FontSize="24" TextWrapping="Wrap"
                            Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold" Margin="0,106,202,240" />
-                <TextBox PreviewTextInput="TextBox_OnPreviewTextInput" BorderBrush="Red" BorderThickness="4"
+                <TextBox PreviewTextInput="TextBox_OnPreviewTextInput"
                          DataObject.Pasting="TextBoxPasting" PreviewKeyDown="TextBox_OnKeyDown" IsUndoEnabled="False"
-                         FontSize="24"
+                         FontSize="24" Style="{DynamicResource MyTextBoxStyle2}"
                          Text="{Binding CodeTextBoxText, FallbackValue=123, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          IsEnabled="{Binding DownloadNotInProgress}"
-                         TextAlignment="Left" Background="{DynamicResource TextBox.Background}"
-                         Foreground="{DynamicResource TextBox.Foreground}" VerticalContentAlignment="Center"
-                         HorizontalContentAlignment="Left" Margin="0,134,0,188" />
+                         TextAlignment="Left" VerticalContentAlignment="Center"
+                         Margin="0,134,0,188" />
                 <CheckBox Style="{DynamicResource MyCheckBoxStyle}" FontSize="24" FontWeight="Bold"
                           Content="Печатать с обеих сторон листа" Foreground="White" Padding="0,0,0,0"
                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                           UseLayoutRounding="True" IsChecked="True" Margin="0,210,0,132" />
-                <Label FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                <Label x:Name="ErrorLine2" FontSize="16" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                        Background="Red" Foreground="White" Content="{Binding ErrorTextBlockText, FallbackValue=123}"
                        Padding="0,0,0,0" Margin="0,259,0,85" />
-                <ProgressBar Value="{Binding ProgressBarValue, FallbackValue=20}" Background="#FFD9D9D9"
-                             Foreground="#FF8B00" Margin="0,259,0,85" />
+                <ProgressBar Value="{Binding ProgressBarValue, FallbackValue=20}" Background="{DynamicResource ProgressBar.Background}"
+                             Foreground="{DynamicResource ProgressBar.Foreground}" Margin="0,259,0,85" />
                 <Button Style="{DynamicResource MyButtonStyle}" Content="Распечатать" Click="ManualPrint_OnClick"
-                        Foreground="{DynamicResource Button.Foreground}" FontSize="20"
-                        IsDefault="True" IsEnabled="{Binding DownloadNotInProgress}" Margin="0,322,0,0" />
+                        FontSize="20" IsDefault="True" IsEnabled="{Binding DownloadNotInProgress}" Margin="0,322,0,0" />
             </Grid>
         </Canvas>
     </Viewbox>
