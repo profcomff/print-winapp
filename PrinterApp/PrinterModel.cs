@@ -90,7 +90,7 @@ namespace PrinterApp
                     wc.DownloadFileCompleted +=
                         (o, args) => { Print(saveFilePath, new PrintOptions("", 1, false)); };
                     wc.DownloadFileAsync(
-                        new Uri("https://dyakov.space/wp-content/uploads/iddqd.pdf"),
+                        new Uri("https://cdn.profcomff.com/app/printer/iddqd.pdf"),
                         saveFilePath);
                 }
 
