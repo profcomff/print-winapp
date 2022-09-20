@@ -30,7 +30,8 @@ namespace PrinterApp
 
         private bool IsTextAllowed(string text)
         {
-            Log.Debug($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Regex.IsMatch({text}) = {text.Equals(_regex.Match(text).Value)}");
+            Log.Debug(
+                $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Regex.IsMatch({text}) = {text.Equals(_regex.Match(text).Value)}");
             return text.Equals(_regex.Match(text).Value);
         }
 
@@ -86,7 +87,8 @@ namespace PrinterApp
             if (_printerModel.PrinterViewModel.CodeTextBoxText !=
                 "dyakov".ToUpper())
             {
-                Log.Information($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Attempt to close without access");
+                Log.Information(
+                    $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Attempt to close without access");
                 Process.Start(Application.ResourceAssembly.Location);
                 Application.Current.Shutdown();
             }
@@ -94,6 +96,13 @@ namespace PrinterApp
 
         private void ManualPrint_OnClick(object sender, RoutedEventArgs e)
         {
+        }
+
+        private void UIElement_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+            _printerModel.Print( /*button.Name == "Print2"*/false);
+            e.Handled = true;
         }
     }
 }
