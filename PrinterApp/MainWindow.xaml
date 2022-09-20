@@ -14,7 +14,7 @@
         Topmost="True"
         ShowInTaskbar="False"
         d:DataContext="{d:DesignInstance local:PrinterViewModel}">
-    <Viewbox Stretch="Fill">
+    <Viewbox Stretch="Fill" KeyDown="UIElement_OnKeyDown">
         <Canvas Background="{DynamicResource App.Background}" Height="900" Width="1600">
             <Rectangle Width="3" Height="590" Canvas.Left="684" Canvas.Top="155"
                        Fill="{DynamicResource Labels.Foreground}" />
