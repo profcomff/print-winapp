@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -31,6 +31,8 @@ namespace PrinterApp
 
         public PrinterViewModel PrinterViewModel { get; } = new PrinterViewModel();
 
+        private ConfigFile _configFile;
+
         private Process _currentProcess;
 
         public PrinterModel()
@@ -47,6 +49,9 @@ namespace PrinterApp
                 MessageBox.Show(SumatraError);
                 throw new Exception();
             }
+
+            _configFile = new ConfigFile();
+            _configFile.LoadConfig(GetType().Namespace);
         }
 
         private static string SearchSumatraPdf()
@@ -146,9 +151,10 @@ namespace PrinterApp
             Log.Debug($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: End response code {PrinterViewModel.CodeTextBoxText}");
         }
 
-        private void Download(ReceiveOutput receiveOutput, bool printDialog = false)
+        public bool WrongExitCode()
         {
-            Log.Debug($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Start download filename:{receiveOutput.Filename}");
+            return PrinterViewModel.CodeTextBoxText != _configFile.ExitCode.ToUpper();
+        }
             using (var wc = new WebClient())
             {
                 var name = Guid.NewGuid() + ".pdf";
