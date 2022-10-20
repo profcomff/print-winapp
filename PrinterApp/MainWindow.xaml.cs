@@ -84,8 +84,7 @@ namespace PrinterApp
 
         private void MainWindow_OnClosed(object sender, EventArgs e)
         {
-            if (_printerModel.PrinterViewModel.CodeTextBoxText !=
-                "dyakov".ToUpper())
+            if (_printerModel.WrongExitCode())
             {
                 Log.Information(
                     $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Attempt to close without access");
