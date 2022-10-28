@@ -23,5 +23,10 @@ namespace PrinterApp
             MainWindow.Title = $"{MainWindow.Title} {assemblyVersion}";
             MainWindow.Show();
         }
+
+        private void App_OnExit(object sender, ExitEventArgs e)
+        {
+            Log.CloseAndFlush();
+        }
     }
 }
