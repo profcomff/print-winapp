@@ -21,11 +21,6 @@ namespace PrinterApp
         private const string SumatraError =
             "[Error] program SumatraPdf is not found\ninform the responsible person\n\n[Ошибка] программа SumatraPdf не найдена\nсообщите ответственному лицу";
 
-        private static readonly string SavePath =
-            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-            Path.DirectorySeparatorChar +
-            ".printerApp";
-
         private static readonly string SumatraPathSuffix =
             Path.DirectorySeparatorChar + "SumatraPDF" +
             Path.DirectorySeparatorChar + "SumatraPDF.exe";
@@ -38,21 +33,26 @@ namespace PrinterApp
 
         public PrinterModel()
         {
+            _configFile = new ConfigFile();
+            _configFile.LoadConfig(GetType().Namespace);
+
             ServicePointManager.SecurityProtocol =
                 SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
                 SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
-            if (!Directory.Exists(SavePath))
-                Directory.CreateDirectory(SavePath);
+            if (!Directory.Exists(_configFile.TempSavePath))
+                Directory.CreateDirectory(_configFile.TempSavePath);
+
+            var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            var str = Assembly.GetExecutingAssembly().Location;
+            key?.SetValue(GetType().Namespace, _configFile.StartWithWindows ? str : string.Empty);
 
             if (SearchSumatraPdf() == "")
             {
                 MessageBox.Show(SumatraError);
                 throw new Exception();
             }
-
-            _configFile = new ConfigFile();
-            _configFile.LoadConfig(GetType().Namespace);
         }
 
         private static string SearchSumatraPdf()
@@ -90,7 +90,8 @@ namespace PrinterApp
             {
                 using (var wc = new WebClient())
                 {
-                    var saveFilePath = SavePath + Path.DirectorySeparatorChar + "iddqd.pdf";
+                    var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar +
+                                       "iddqd.pdf";
                     saveFilePath =
                         saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
                     wc.DownloadFileCompleted += async (o, args) =>
@@ -193,7 +194,7 @@ namespace PrinterApp
             using (var wc = new WebClient())
             {
                 var name = Guid.NewGuid() + ".pdf";
-                var saveFilePath = SavePath + Path.DirectorySeparatorChar + name;
+                var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar + name;
                 saveFilePath = saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
                 PrinterViewModel.ProgressBarVisibility = Visibility.Visible;
                 wc.DownloadProgressChanged += DownloadProgressChanged;
@@ -264,7 +265,7 @@ namespace PrinterApp
 
         private void DeleteOldFiles()
         {
-            foreach (FileInfo file in new DirectoryInfo(SavePath).GetFiles())
+            foreach (FileInfo file in new DirectoryInfo(_configFile.TempSavePath).GetFiles())
             {
                 file.Delete();
             }
