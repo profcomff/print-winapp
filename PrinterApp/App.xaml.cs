@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using System;
+using System.IO;
+using Serilog;
 using System.Reflection;
 using System.Windows;
 
@@ -14,7 +16,9 @@ namespace PrinterApp
             var fileName = GetType().Namespace;
             Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
                 .WriteTo.Console()
-                .WriteTo.File($"logs/{fileName}.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(
+                    $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}{Path.DirectorySeparatorChar}.printerAppLogs/{fileName}.txt",
+                    rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             //Since we no longer have the StarupUri, we have to manually open our window.
