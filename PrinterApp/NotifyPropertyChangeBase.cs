@@ -5,7 +5,7 @@ namespace PrinterApp
 {
     public class NotifyPropertyChangeBase : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string prop = "")
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace PrinterApp
@@ -18,12 +19,15 @@ namespace PrinterApp
             BaseAddress = new Uri("https://marketing.api.profcomff.com/v1/"),
         };
 #endif
+        private static readonly string AssemblyVersion =
+            Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty;
 
         private static async Task Post(string action, string status, string pathFrom,
             string pathTo)
         {
             var body = new MarketingBody(action: action,
-                additional_data: $"{{\"status\": \"{status}\"}}",
+                additional_data:
+                $"{{\"status\": \"{status}\",\"app_version\": \"{AssemblyVersion}\"}}",
                 path_from: pathFrom, path_to: pathTo);
             await SharedClient.PostAsJsonAsync("action", body);
         }

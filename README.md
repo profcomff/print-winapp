@@ -1,15 +1,15 @@
 # Printer windows application
 
-Requirements: Microsoft .NET Framework 4.7.2
+Requirements: Microsoft .NET 6.0
 
 ## Installation
 PrinterWinApp is packaged as both an standalone zip. It will run on Windows 10 or newer.
-1. Download PrinterApp_x__.7z 64-bit or 32-bit version from [releases](https://github.com/profcomff/print-winapp/releases/latest)
+1. Download PrinterApp_x__.zip 64-bit or 32-bit version from [releases](https://github.com/profcomff/print-winapp/releases/latest)
 2. Unpack zip (recommend use default patch `C:/Users/<You>/AppData/Local/PrinterWinApp`)
-3. If not on your system Microsoft .NET Framework 4.7.2 install it
-4. Add PrinterApp.exe to autorun.
+3. If not on your system Microsoft .NET 6.0 Runtime install it
+4. Run PrinterApp.exe for the first time, then you can configure PrinterApp.json.
 
 ## Installed
-By default, PrinterWinApp will put its own logs to the directory next to the executable file `./logs/`.
+By default, PrinterWinApp will put its own logs to the directory `%userprofile%/.printerAppLogs/`.
 
-The temporary file storage is located at `C:/Users/<You>/.printerApp/`
+The temporary file storage is located at `%temp%/.printerApp/`

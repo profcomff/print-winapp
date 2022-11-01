@@ -14,16 +14,28 @@ namespace PrinterApp
         private void App_OnStartup(object sender, StartupEventArgs e)
         {
             var fileName = GetType().Namespace;
-            Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
+#if DEBUG
+            var log = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Debug()
+                .WriteTo.File(
+                    $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}{Path.DirectorySeparatorChar}.printerAppLogs/{fileName}.txt",
+                    rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+#else
+            var log = new LoggerConfiguration()
+                .MinimumLevel.Information()
                 .WriteTo.Console()
                 .WriteTo.File(
                     $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}{Path.DirectorySeparatorChar}.printerAppLogs/{fileName}.txt",
                     rollingInterval: RollingInterval.Day)
                 .CreateLogger();
+#endif
+            Log.Logger = log;
 
             //Since we no longer have the StarupUri, we have to manually open our window.
             MainWindow = new MainWindow();
-            var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
             MainWindow.Title = $"{MainWindow.Title} {assemblyVersion}";
             MainWindow.Show();
         }
