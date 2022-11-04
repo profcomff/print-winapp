@@ -1,0 +1,48 @@
+name: "Deploy PrinterApp x86"
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  PROJECT_PATH: PrinterApp/PrinterApp.csproj
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - run: dotnet build ${{ env.PROJECT_PATH }} -c Release --no-restore
+
+      - run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x86 -p:PublishSingleFile=true -p:PlatformTarget=x86 --no-build
+
+      - name: Archive Release
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          filename: 'PrinterApp_x86.zip'
+          exclusions: '*.pdb'
+
+      - uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+
+      - uses: csexton/release-asset-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: 'PrinterApp_x86.zip'
+          release-url: ${{ steps.create_release.outputs.upload_url }}
