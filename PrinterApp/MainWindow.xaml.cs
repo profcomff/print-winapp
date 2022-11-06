@@ -14,13 +14,20 @@ namespace PrinterApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly PrinterModel _printerModel = new PrinterModel();
-        private readonly Regex _regex = new Regex("[a-zA-Z0-9]{0,8}");
+        private readonly PrinterModel _printerModel;
+        private readonly Regex _regex = new("[a-zA-Z0-9]{0,8}");
+        private readonly AutoUpdater _autoUpdater = new();
 
         public MainWindow()
         {
+            ConfigFile configFile = new();
+            configFile.LoadConfig(GetType().Namespace!);
+            _printerModel = new PrinterModel(configFile);
             Loaded += (sender, e) =>
+            {
                 MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+                if (configFile.AutoUpdate) _autoUpdater.StartTimer();
+            };
             DataContext = _printerModel.PrinterViewModel;
             InitializeComponent();
             if (40 + Height < SystemParameters.PrimaryScreenHeight)
@@ -86,10 +93,14 @@ namespace PrinterApp
         {
             if (_printerModel.WrongExitCode())
             {
+                _autoUpdater.StopTimer();
                 Log.Information(
                     $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Attempt to close without access");
-                Process.Start(Application.ResourceAssembly.Location);
-                Application.Current.Shutdown();
+                Log.Information(
+                    $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Start {Environment.ProcessPath!}");
+                Process.Start(Environment.ProcessPath!);
+                Log.CloseAndFlush();
+                Environment.Exit(0);
             }
         }
 

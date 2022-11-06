@@ -1,29 +1,26 @@
 ﻿using Newtonsoft.Json;
 using Serilog;
+using System;
 using System.IO;
 using System.Reflection;
-using System;
 
 namespace PrinterApp
 {
     public class ConfigFile
     {
-        [JsonProperty(Required = Required.Always)]
         public string ExitCode { get; set; } = "dyakov";
-
-        [JsonProperty(Required = Required.Always)]
         public string TempSavePath { get; set; } = Path.GetTempPath() + ".printerApp";
-
-        [JsonProperty(Required = Required.Always)]
         public bool StartWithWindows { get; set; } = false;
+        public bool AutoUpdate { get; set; } = true;
 
         public void LoadConfig(string fileName)
         {
             Log.Information($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name} start");
-
             var configPath =
-                Directory.GetParent(System.Reflection.Assembly.GetExecutingAssembly().Location)
-                    ?.ToString() + Path.DirectorySeparatorChar + $"{fileName}.json";
+                Path.Combine(
+                    Path.GetDirectoryName(Environment.ProcessPath) ??
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    $"{fileName}.json");
             Log.Debug(
                 $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Full config file patch: {configPath}");
             if (File.Exists(configPath))
@@ -37,6 +34,8 @@ namespace PrinterApp
                         ExitCode = config.ExitCode;
                         TempSavePath = config.TempSavePath;
                         StartWithWindows = config.StartWithWindows;
+                        AutoUpdate = config.AutoUpdate;
+                        WriteConfig(configPath);
                         Log.Debug("Load from config file\n" +
                                   JsonConvert.SerializeObject(this, Formatting.Indented));
                     }

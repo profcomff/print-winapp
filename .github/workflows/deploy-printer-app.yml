@@ -9,7 +9,7 @@ env:
   PROJECT_PATH: PrinterApp/PrinterApp.csproj
 
 jobs:
-  deploy:
+  build_release:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,14 +22,13 @@ jobs:
 
       - run: dotnet restore ${{ env.PROJECT_PATH }}
 
-      - run: dotnet build ${{ env.PROJECT_PATH }} -c Release --no-restore
-
-      - run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x86 -p:PublishSingleFile=true -p:PlatformTarget=x86 --no-build
+      - run: dotnet publish ${{ env.PROJECT_PATH }} -c Release --self-contained -r win-x86 -p:PublishSingleFile=true -p:PlatformTarget=x86 --no-restore
 
       - name: Archive Release
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
+          directory: 'PrinterApp/bin/Release/net6.0-windows/win-x86/publish/'
           filename: 'PrinterApp_x86.zip'
           exclusions: '*.pdb'
 
@@ -44,5 +43,5 @@ jobs:
       - uses: csexton/release-asset-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          file: 'PrinterApp_x86.zip'
+          file: 'PrinterApp/bin/Release/net6.0-windows/win-x86/publish/PrinterApp_x86.zip'
           release-url: ${{ steps.create_release.outputs.upload_url }}

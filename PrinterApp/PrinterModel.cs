@@ -25,19 +25,16 @@ namespace PrinterApp
             Path.DirectorySeparatorChar + "SumatraPDF" +
             Path.DirectorySeparatorChar + "SumatraPDF.exe";
 
-        public PrinterViewModel PrinterViewModel { get; } = new PrinterViewModel();
+        public PrinterViewModel PrinterViewModel { get; } = new();
 
-        private ConfigFile _configFile;
+        private readonly ConfigFile _configFile;
 
-        private Process _currentProcess;
-
-        public PrinterModel()
+        public PrinterModel(ConfigFile configFile)
         {
-            _configFile = new ConfigFile();
-            _configFile.LoadConfig(GetType().Namespace);
+            _configFile = configFile;
 
             ServicePointManager.SecurityProtocol =
-                SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls |
+                SecurityProtocolType.Tls |
                 SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
             if (!Directory.Exists(_configFile.TempSavePath))
@@ -45,7 +42,7 @@ namespace PrinterApp
 
             var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
                 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-            var str = Assembly.GetExecutingAssembly().Location;
+            var str = Environment.ProcessPath ?? string.Empty;
             key?.SetValue(GetType().Namespace, _configFile.StartWithWindows ? str : string.Empty);
 
             if (SearchSumatraPdf() == "")
@@ -76,6 +73,7 @@ namespace PrinterApp
                    SumatraPathSuffix;
             return File.Exists(path) ? path : "";
         }
+
 
         public async void Print(bool printDialog)
         {
@@ -132,12 +130,12 @@ namespace PrinterApp
                         var receiveOutput =
                             JsonConvert.DeserializeObject<ReceiveOutput>(responseBody);
 
-                        if (receiveOutput?.Filename.Length > 0)
+                        if (receiveOutput != null && receiveOutput.Filename.Length > 0)
                         {
                             DeleteOldFiles();
                             await Marketing.StartDownload(
                                 pathFrom: patchFrom,
-                                pathTo: $"{StaticUrl}/{receiveOutput?.Filename}");
+                                pathTo: $"{StaticUrl}/{receiveOutput.Filename}");
                             Download(receiveOutput, patchFrom, printDialog);
                         }
                         else
@@ -156,8 +154,8 @@ namespace PrinterApp
                         PrinterViewModel.ErrorTextBlockText = HttpError;
                     }
                 }
-                else if (response.StatusCode == HttpStatusCode.NotFound ||
-                         response.StatusCode == HttpStatusCode.UnsupportedMediaType)
+                else if (response.StatusCode is HttpStatusCode.NotFound
+                         or HttpStatusCode.UnsupportedMediaType)
                 {
                     await Marketing.CheckCode(statusOk: false, pathFrom: patchFrom);
 
@@ -201,7 +199,7 @@ namespace PrinterApp
                 wc.DownloadFileCompleted += async (sender, args) =>
                 {
                     await Marketing.FinishDownload(pathFrom: patchFrom,
-                        pathTo: $"{StaticUrl}/{receiveOutput?.Filename}");
+                        pathTo: $"{StaticUrl}/{receiveOutput.Filename}");
                     PrinterViewModel.ProgressBarVisibility = Visibility.Collapsed;
                     await Print(saveFilePath, receiveOutput.Options, patchFrom, printDialog);
                 };
@@ -224,7 +222,6 @@ namespace PrinterApp
             var sumatraPath = SearchSumatraPdf();
             if (sumatraPath != "")
             {
-                _currentProcess = new Process();
                 var arguments = "-print-dialog";
                 if (!printDialog)
                 {
@@ -251,8 +248,8 @@ namespace PrinterApp
 
                 await Marketing.StartSumatra(pathFrom: patchFrom);
 
-                _currentProcess.StartInfo = startInfo;
-                var _ = _currentProcess.Start();
+                Process currentProcess = new() { StartInfo = startInfo };
+                var _ = currentProcess.Start();
             }
             else
             {
