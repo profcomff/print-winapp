@@ -99,5 +99,23 @@ namespace PrinterApp
                 pathFrom: pathFrom,
                 pathTo: "");
         }
+
+        public static async Task LoadProgram()
+        {
+            await Post(
+                action: "print terminal load",
+                status: "ok",
+                pathFrom: "",
+                pathTo: "");
+        }
+
+        public static async Task UpdateDownloaded()
+        {
+            await Post(
+                action: "print terminal update download",
+                status: "ok",
+                pathFrom: "",
+                pathTo: "");
+        }
     }
 }

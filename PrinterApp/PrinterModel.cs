@@ -50,6 +50,7 @@ namespace PrinterApp
                 MessageBox.Show(SumatraError);
                 throw new Exception();
             }
+            new Task(async () => { await Marketing.LoadProgram(); }).Start();
         }
 
         private static string SearchSumatraPdf()

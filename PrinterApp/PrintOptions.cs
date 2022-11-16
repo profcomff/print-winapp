@@ -1,4 +1,7 @@
-﻿namespace PrinterApp
+﻿using Newtonsoft.Json;
+using System.Text.Json.Serialization;
+
+namespace PrinterApp
 {
     public class PrintOptions
     {
@@ -11,6 +14,6 @@
 
         public string Pages { get; }
         public int Copies { get; }
-        public bool TwoSided { get; }
+        [JsonProperty("two_sided")] public bool TwoSided { get; }
     }
 }

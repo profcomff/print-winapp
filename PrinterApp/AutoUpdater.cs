@@ -100,6 +100,7 @@ public class AutoUpdater
                     Log.Information(
                         $"{GetType().Name} CheckNewVersion: Finish download");
 
+                    await Marketing.UpdateDownloaded();
                     Process.Start(new ProcessStartInfo(BatFileName) { UseShellExecute = false });
                     await Log.CloseAndFlushAsync();
                     Environment.Exit(0);
