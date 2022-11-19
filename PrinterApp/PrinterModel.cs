@@ -6,9 +6,14 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.WebSockets;
 using System.Reflection;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
+using QRCoder;
 
 namespace PrinterApp
 {
@@ -17,9 +22,11 @@ namespace PrinterApp
 #if DEBUG
         private const string FileUrl = "https://printer.api.test.profcomff.com/file";
         private const string StaticUrl = "https://printer.api.test.profcomff.com/static";
+        private const string WebSockUrl = "wss://printer.api.test.profcomff.com/qr";
 #else
         private const string FileUrl = "https://printer.api.profcomff.com/file";
         private const string StaticUrl = "https://printer.api.profcomff.com/static";
+        private const string WebSockUrl = "wss://printer.api.profcomff.com/qr";
 #endif
         private const string CodeError = "Некорректный код";
         private const string HttpError = "Ошибка сети";
@@ -35,6 +42,7 @@ namespace PrinterApp
 
         private readonly ConfigFile _configFile;
         private readonly HttpClient _httpClient;
+        private bool _socketClose;
 
         public PrinterModel(ConfigFile configFile)
         {
@@ -62,6 +70,8 @@ namespace PrinterApp
                 throw new Exception();
             }
 
+            SocketsStartAsync();
+
             Marketing.LoadProgram();
         }
 
@@ -87,7 +97,6 @@ namespace PrinterApp
             return File.Exists(path) ? path : "";
         }
 
-
         public async void PrintAsync(bool printDialog)
         {
             if (PrinterViewModel.CodeTextBoxText.Length < 1)
@@ -97,12 +106,14 @@ namespace PrinterApp
                 return;
             }
 
+            PrinterViewModel.DownloadNotInProgress = false;
             if (PrinterViewModel.CodeTextBoxText.ToUpper() == "IDDQD")
             {
                 var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar +
                                    "iddqd.pdf";
                 saveFilePath =
                     saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
+                PrinterViewModel.PrintQrVisibility = Visibility.Collapsed;
                 ShowComplement();
                 await using var s =
                     await _httpClient.GetStreamAsync(
@@ -138,7 +149,7 @@ namespace PrinterApp
                         PrinterViewModel.CodeTextBoxText = "";
                         var responseBody = await response.Content.ReadAsStringAsync();
                         var fileWithOptions =
-                            JsonConvert.DeserializeObject<ReceiveOutput>(responseBody);
+                            JsonConvert.DeserializeObject<FileWithOptions>(responseBody);
 
                         if (fileWithOptions != null && fileWithOptions.Filename.Length > 0)
                         {
@@ -157,7 +168,6 @@ namespace PrinterApp
                     {
                         Marketing.DownloadException(status: exception.Message,
                             pathFrom: patchFrom);
-
                         Log.Error(
                             $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
                         PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
@@ -183,7 +193,6 @@ namespace PrinterApp
             }
 
             PrinterViewModel.DownloadNotInProgress = true;
-
             Log.Debug(
                 $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: End response code {PrinterViewModel.CodeTextBoxText}");
         }
@@ -193,14 +202,16 @@ namespace PrinterApp
             return PrinterViewModel.CodeTextBoxText != _configFile.ExitCode.ToUpper();
         }
 
-        private async Task Download(ReceiveOutput fileWithOptions, string patchFrom,
+        private async Task Download(FileWithOptions fileWithOptions, string patchFrom,
             bool printDialog = false)
+
         {
             Log.Debug(
                 $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Start download filename:{fileWithOptions.Filename}");
             var name = Guid.NewGuid() + ".pdf";
             var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar + name;
             saveFilePath = saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
+            PrinterViewModel.PrintQrVisibility = Visibility.Collapsed;
             ShowComplement();
             await using var s =
                 await _httpClient.GetStreamAsync($"{StaticUrl}/{fileWithOptions.Filename}");
@@ -275,7 +286,154 @@ namespace PrinterApp
                 PrinterViewModel.Compliment = Compliments.GetRandomCompliment();
                 await Task.Delay(5000);
                 PrinterViewModel.Compliment = "";
+                PrinterViewModel.PrintQrVisibility = Visibility.Visible;
             }).Start();
+        }
+
+        private static BitmapImage LoadImage(byte[] imageData)
+        {
+            if (imageData == null! || imageData.Length == 0) return null!;
+            var image = new BitmapImage();
+            using (var mem = new MemoryStream(imageData))
+            {
+                mem.Position = 0;
+                image.BeginInit();
+                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.UriSource = null;
+                image.StreamSource = mem;
+                image.EndInit();
+            }
+
+            image.Freeze();
+            return image;
+        }
+
+        public void SocketsClose()
+        {
+            _socketClose = true;
+        }
+
+        private async void SocketsStartAsync()
+        {
+            var socket = new ClientWebSocket();
+            socket.Options.SetRequestHeader("Authorization",
+                _httpClient.DefaultRequestHeaders.Authorization!.ToString());
+            try
+            {
+                await socket.ConnectAsync(new Uri(WebSockUrl), CancellationToken.None);
+                if (socket.State != WebSocketState.Open)
+                {
+                    Marketing.SocketException(
+                        status: $"WebSocketState not Open state:{socket.State}");
+                    Log.Error(
+                        $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: WebSocketState not Open state:{socket.State}");
+                    return;
+                }
+
+                _socketClose = false;
+                var buffer = new byte[128 * 1024];
+                while (!_socketClose)
+                {
+                    var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer),
+                        CancellationToken.None);
+                    var json = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    if (!result.EndOfMessage)
+                    {
+                        Thread.Sleep(100);
+                        result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer),
+                            CancellationToken.None);
+                        json += Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    }
+
+                    await ParseResponseFromSocket(
+                        JsonConvert.DeserializeObject<WebsocketReceiveOptions>(json));
+                }
+
+                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Good Bye",
+                    CancellationToken.None);
+            }
+            catch (Exception exception)
+            {
+                _socketClose = true;
+                Marketing.SocketException(status: exception.Message);
+                Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
+                PrinterViewModel.PrintQr = null!;
+                if (socket.State == WebSocketState.Aborted ||
+                    socket.State == WebSocketState.Closed && socket.CloseStatus == null)
+                {
+                    await Task.Delay(5000);
+                    SocketsStartAsync();
+                }
+            }
+        }
+
+        private async Task ParseResponseFromSocket(WebsocketReceiveOptions? websocketReceiveOptions)
+        {
+            if (websocketReceiveOptions == null)
+            {
+                Marketing.SocketException("websocketReceiveOptions is null");
+                return;
+            }
+
+            if (websocketReceiveOptions.QrToken == null!)
+            {
+                Marketing.SocketException("websocketReceiveOptions QrToken is null");
+                return;
+            }
+
+            PrinterViewModel.PrintQr = null!;
+            PrinterViewModel.DownloadNotInProgress = false;
+            if (websocketReceiveOptions.Files != null!)
+            {
+                DeleteOldFiles();
+                foreach (var fileWithOptions in websocketReceiveOptions.Files)
+                {
+                    const string patchFrom = "websocket";
+                    try
+                    {
+                        PrinterViewModel.CodeTextBoxText = "";
+
+                        if (fileWithOptions.Filename.Length > 0)
+                        {
+                            Marketing.StartDownload(
+                                pathFrom: patchFrom,
+                                pathTo: $"{StaticUrl}/{fileWithOptions.Filename}");
+                            await Download(fileWithOptions, patchFrom);
+                        }
+                        else
+                        {
+                            Marketing.PrintNotFile(pathFrom: patchFrom);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        Marketing.DownloadException(status: exception.Message,
+                            pathFrom: patchFrom);
+
+                        Log.Error(
+                            $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
+                        PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
+                        PrinterViewModel.ErrorTextBlockText = HttpError;
+                    }
+                }
+            }
+
+            PrinterViewModel.DownloadNotInProgress = true;
+            GenerateQr(websocketReceiveOptions.QrToken);
+        }
+
+        private void GenerateQr(string value)
+        {
+            Log.Debug(
+                $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: new qr code {value}");
+            var qrGenerator = new QRCodeGenerator();
+            var qrCodeData = qrGenerator.CreateQrCode(value, QRCodeGenerator.ECCLevel.Q);
+            var qrCode = new PngByteQRCode(qrCodeData);
+            byte[] white = { 255, 255, 255, 255 };
+            byte[] transparent = { 0, 0, 0, 0 };
+            var qrCodeImage = qrCode.GetGraphic(20, white, transparent, false);
+            PrinterViewModel.PrintQr = LoadImage(qrCodeImage);
         }
     }
 }

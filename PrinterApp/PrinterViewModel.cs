@@ -10,6 +10,8 @@ namespace PrinterApp
         private string _codeTextBoxText = "";
         private string _errorTextBlockText = "";
         private Visibility _errorTextBlockVisibility = Visibility.Collapsed;
+        private BitmapImage _printQr = new();
+        private Visibility _printQrVisibility = Visibility.Visible;
         private string _compliment = "";
         private Visibility _flakesVisibility = Visibility.Collapsed;
         private ObservableCollection<double> _flakesCanvasTop = new();
@@ -55,6 +57,28 @@ namespace PrinterApp
             {
                 if (value == _errorTextBlockVisibility) return;
                 _errorTextBlockVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public BitmapImage PrintQr
+        {
+            get => _printQr;
+            set
+            {
+                if (Equals(value, _printQr)) return;
+                _printQr = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility PrintQrVisibility
+        {
+            get => _printQrVisibility;
+            set
+            {
+                if (value == _printQrVisibility) return;
+                _printQrVisibility = value;
                 OnPropertyChanged();
             }
         }

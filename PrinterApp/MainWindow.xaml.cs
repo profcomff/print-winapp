@@ -177,11 +177,8 @@ namespace PrinterApp
                 return;
             }
 
+            _printerModel.SocketsClose();
             _autoUpdater.StopTimer();
-        }
-
-        private void ManualPrint_OnClick(object sender, RoutedEventArgs e)
-        {
         }
 
         private void UIElement_OnKeyDown(object sender, KeyEventArgs e)
