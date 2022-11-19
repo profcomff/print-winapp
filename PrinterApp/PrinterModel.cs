@@ -50,6 +50,7 @@ namespace PrinterApp
                 MessageBox.Show(SumatraError);
                 throw new Exception();
             }
+
             new Task(async () => { await Marketing.LoadProgram(); }).Start();
         }
 
@@ -247,6 +248,8 @@ namespace PrinterApp
                     Arguments = $"{arguments} {saveFilePath}"
                 };
 
+                ShowComplement();
+
                 await Marketing.StartSumatra(pathFrom: patchFrom);
 
                 Process currentProcess = new() { StartInfo = startInfo };
@@ -270,6 +273,13 @@ namespace PrinterApp
 
             Log.Debug(
                 $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: delete all files complete");
+        }
+
+        private async Task ShowComplement()
+        {
+            PrinterViewModel.Compliment = Compliments.GetRandomCompliment();
+            await Task.Delay(4000);
+            PrinterViewModel.Compliment = "";
         }
     }
 }

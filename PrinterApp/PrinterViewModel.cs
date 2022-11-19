@@ -10,6 +10,7 @@ namespace PrinterApp
         private Visibility _errorTextBlockVisibility = Visibility.Collapsed;
         private double _progressBarValue;
         private Visibility _progressBarVisibility = Visibility.Collapsed;
+        private string _compliment = "";
 
         public bool DownloadNotInProgress
         {
@@ -73,6 +74,17 @@ namespace PrinterApp
             {
                 if (value == _errorTextBlockVisibility) return;
                 _errorTextBlockVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string Compliment
+        {
+            get => _compliment;
+            set
+            {
+                if (value == _compliment) return;
+                _compliment = value;
                 OnPropertyChanged();
             }
         }
