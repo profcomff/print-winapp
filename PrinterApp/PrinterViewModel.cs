@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace PrinterApp
 {
@@ -11,6 +13,9 @@ namespace PrinterApp
         private double _progressBarValue;
         private Visibility _progressBarVisibility = Visibility.Collapsed;
         private string _compliment = "";
+        private Visibility _flakesVisibility = Visibility.Collapsed;
+        private ObservableCollection<double> _flakesCanvasTop = new();
+        private ObservableCollection<double> _flakesCanvasLeft = new();
 
         public bool DownloadNotInProgress
         {
@@ -85,6 +90,39 @@ namespace PrinterApp
             {
                 if (value == _compliment) return;
                 _compliment = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility FlakesVisibility
+        {
+            get => _flakesVisibility;
+            set
+            {
+                if (value == _flakesVisibility) return;
+                _flakesVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<double> FlakesCanvasTop
+        {
+            get => _flakesCanvasTop;
+            set
+            {
+                if (Equals(value, _flakesCanvasTop)) return;
+                _flakesCanvasTop = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<double> FlakesCanvasLeft
+        {
+            get => _flakesCanvasLeft;
+            set
+            {
+                if (Equals(value, _flakesCanvasLeft)) return;
+                _flakesCanvasLeft = value;
                 OnPropertyChanged();
             }
         }

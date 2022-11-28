@@ -22,6 +22,9 @@
     <None Remove="Images\App.Background.png" />
     <None Remove="Images\app.profcomff.com.png" />
     <None Remove="Images\profcomff_print.png" />
+    <None Remove="Images\snowflake1.png" />
+    <None Remove="Images\snowflake2.png" />
+    <None Remove="Images\snowflake3.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,6 +45,9 @@
     <Resource Include="Images\App.Background.png" />
     <Resource Include="Images\app.profcomff.com.png" />
     <Resource Include="Images\profcomff_print.png" />
+    <Resource Include="Images\snowflake1.png" />
+    <Resource Include="Images\snowflake2.png" />
+    <Resource Include="Images\snowflake3.png" />
   </ItemGroup>
 
 </Project>
