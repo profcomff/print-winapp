@@ -283,4 +283,20 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <ImageBrush x:Key="SnowFlake1" ImageSource="Images/snowflake1.png" />
+    <ImageBrush x:Key="SnowFlake2" ImageSource="Images/snowflake2.png" />
+    <ImageBrush x:Key="SnowFlake3" ImageSource="Images/snowflake3.png" />
+    <Style x:Key="Flake1" TargetType="{x:Type Rectangle}">
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Fill" Value="{DynamicResource SnowFlake1}" />
+    </Style>
+    <Style x:Key="Flake2" TargetType="{x:Type Rectangle}" BasedOn="{StaticResource Flake1}">
+        <Setter Property="Fill" Value="{DynamicResource SnowFlake2}" />
+    </Style>
+    <Style x:Key="Flake3" TargetType="{x:Type Rectangle}" BasedOn="{StaticResource Flake1}">
+        <Setter Property="Fill" Value="{DynamicResource SnowFlake3}" />
+    </Style>
+
 </ResourceDictionary>

@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace PrinterApp
 {
@@ -8,9 +10,10 @@ namespace PrinterApp
         private string _codeTextBoxText = "";
         private string _errorTextBlockText = "";
         private Visibility _errorTextBlockVisibility = Visibility.Collapsed;
-        private double _progressBarValue;
-        private Visibility _progressBarVisibility = Visibility.Collapsed;
         private string _compliment = "";
+        private Visibility _flakesVisibility = Visibility.Collapsed;
+        private ObservableCollection<double> _flakesCanvasTop = new();
+        private ObservableCollection<double> _flakesCanvasLeft = new();
 
         public bool DownloadNotInProgress
         {
@@ -45,28 +48,6 @@ namespace PrinterApp
             }
         }
 
-        public double ProgressBarValue
-        {
-            get => _progressBarValue;
-            set
-            {
-                if (value.Equals(_progressBarValue)) return;
-                _progressBarValue = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Visibility ProgressBarVisibility
-        {
-            get => _progressBarVisibility;
-            set
-            {
-                if (value == _progressBarVisibility) return;
-                _progressBarVisibility = value;
-                OnPropertyChanged();
-            }
-        }
-
         public Visibility ErrorTextBlockVisibility
         {
             get => _errorTextBlockVisibility;
@@ -85,6 +66,39 @@ namespace PrinterApp
             {
                 if (value == _compliment) return;
                 _compliment = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility FlakesVisibility
+        {
+            get => _flakesVisibility;
+            set
+            {
+                if (value == _flakesVisibility) return;
+                _flakesVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<double> FlakesCanvasTop
+        {
+            get => _flakesCanvasTop;
+            set
+            {
+                if (Equals(value, _flakesCanvasTop)) return;
+                _flakesCanvasTop = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<double> FlakesCanvasLeft
+        {
+            get => _flakesCanvasLeft;
+            set
+            {
+                if (Equals(value, _flakesCanvasLeft)) return;
+                _flakesCanvasLeft = value;
                 OnPropertyChanged();
             }
         }

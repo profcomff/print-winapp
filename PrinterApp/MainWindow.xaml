@@ -15,7 +15,33 @@
         ShowInTaskbar="False"
         d:DataContext="{d:DesignInstance local:PrinterViewModel}">
     <Viewbox Stretch="Fill" KeyDown="UIElement_OnKeyDown">
-        <Canvas Background="{DynamicResource App.Background}" Height="900" Width="1600">
+        <Canvas x:Name="RootCanvas" Background="{DynamicResource App.Background}" Height="900" Width="1600">
+            <Canvas Height="900" Width="1600" Visibility="{Binding FlakesVisibility}">
+                <Rectangle Style="{DynamicResource Flake1}" Canvas.Left="{Binding FlakesCanvasLeft[0]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[0]}" />
+                <Rectangle Style="{DynamicResource Flake1}" Canvas.Left="{Binding FlakesCanvasLeft[1]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[1]}" />
+                <Rectangle Style="{DynamicResource Flake1}" Canvas.Left="{Binding FlakesCanvasLeft[2]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[2]}" />
+                <Rectangle Style="{DynamicResource Flake1}" Canvas.Left="{Binding FlakesCanvasLeft[3]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[3]}" />
+                <Rectangle Style="{DynamicResource Flake2}" Canvas.Left="{Binding FlakesCanvasLeft[4]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[4]}" />
+                <Rectangle Style="{DynamicResource Flake2}" Canvas.Left="{Binding FlakesCanvasLeft[5]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[5]}" />
+                <Rectangle Style="{DynamicResource Flake2}" Canvas.Left="{Binding FlakesCanvasLeft[6]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[6]}" />
+                <Rectangle Style="{DynamicResource Flake2}" Canvas.Left="{Binding FlakesCanvasLeft[7]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[7]}" />
+                <Rectangle Style="{DynamicResource Flake3}" Canvas.Left="{Binding FlakesCanvasLeft[8]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[8]}" />
+                <Rectangle Style="{DynamicResource Flake3}" Canvas.Left="{Binding FlakesCanvasLeft[9]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[9]}" />
+                <Rectangle Style="{DynamicResource Flake3}" Canvas.Left="{Binding FlakesCanvasLeft[10]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[10]}" />
+                <Rectangle Style="{DynamicResource Flake3}" Canvas.Left="{Binding FlakesCanvasLeft[11]}"
+                           Canvas.Top="{Binding FlakesCanvasTop[11]}" />
+            </Canvas>
             <Rectangle Width="3" Height="590" Canvas.Left="684" Canvas.Top="155"
                        Fill="{DynamicResource Labels.Foreground}" />
             <TextBlock FontSize="24" Width="641" Height="449" Canvas.Left="814" Canvas.Top="57" TextWrapping="Wrap"
@@ -82,10 +108,6 @@
                 <Button Content="Изменить настройки и распечатать" Click="Print_OnClick"
                         Style="{DynamicResource MyButtonStyle}" FontSize="20"
                         IsEnabled="False" Margin="0,237,0,0" Visibility="Collapsed" />
-                <ProgressBar Visibility="{Binding ProgressBarVisibility}"
-                             Value="{Binding ProgressBarValue, FallbackValue=20}"
-                             Background="{DynamicResource ProgressBar.Background}"
-                             Foreground="{DynamicResource ProgressBar.Foreground}" Margin="0,97,0,162" />
             </Grid>
             <Grid Height="374" Canvas.Left="82" Canvas.Top="273" Width="410" Visibility="Collapsed" d:IsHidden="True">
                 <TextBlock Text="Страницы" FontSize="24" TextWrapping="Wrap"
@@ -114,9 +136,6 @@
                        VerticalContentAlignment="Center"
                        Background="Red" Foreground="White" Content="{Binding ErrorTextBlockText, FallbackValue=123}"
                        Padding="0,0,0,0" Margin="0,259,0,85" />
-                <ProgressBar Value="{Binding ProgressBarValue, FallbackValue=20}"
-                             Background="{DynamicResource ProgressBar.Background}"
-                             Foreground="{DynamicResource ProgressBar.Foreground}" Margin="0,259,0,85" />
                 <Button Style="{DynamicResource MyButtonStyle}" Content="Распечатать" Click="ManualPrint_OnClick"
                         FontSize="20" IsDefault="True" IsEnabled="{Binding DownloadNotInProgress}" Margin="0,322,0,0" />
             </Grid>
