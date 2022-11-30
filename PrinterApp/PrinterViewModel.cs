@@ -10,8 +10,6 @@ namespace PrinterApp
         private string _codeTextBoxText = "";
         private string _errorTextBlockText = "";
         private Visibility _errorTextBlockVisibility = Visibility.Collapsed;
-        private double _progressBarValue;
-        private Visibility _progressBarVisibility = Visibility.Collapsed;
         private string _compliment = "";
         private Visibility _flakesVisibility = Visibility.Collapsed;
         private ObservableCollection<double> _flakesCanvasTop = new();
@@ -46,28 +44,6 @@ namespace PrinterApp
             {
                 if (value == _errorTextBlockText) return;
                 _errorTextBlockText = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public double ProgressBarValue
-        {
-            get => _progressBarValue;
-            set
-            {
-                if (value.Equals(_progressBarValue)) return;
-                _progressBarValue = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Visibility ProgressBarVisibility
-        {
-            get => _progressBarVisibility;
-            set
-            {
-                if (value == _progressBarVisibility) return;
-                _progressBarVisibility = value;
                 OnPropertyChanged();
             }
         }

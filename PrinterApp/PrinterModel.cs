@@ -13,8 +13,13 @@ namespace PrinterApp
 {
     public class PrinterModel
     {
+#if DEBUG
+        private const string FileUrl = "https://printer.api.test.profcomff.com/file";
+        private const string StaticUrl = "https://printer.api.test.profcomff.com/static";
+#else
         private const string FileUrl = "https://printer.api.profcomff.com/file";
         private const string StaticUrl = "https://printer.api.profcomff.com/static";
+#endif
         private const string CodeError = "Некорректный код";
         private const string HttpError = "Ошибка сети";
 
@@ -51,7 +56,7 @@ namespace PrinterApp
                 throw new Exception();
             }
 
-            new Task(async () => { await Marketing.LoadProgram(); }).Start();
+            Marketing.LoadProgram();
         }
 
         private static string SearchSumatraPdf()
@@ -77,7 +82,7 @@ namespace PrinterApp
         }
 
 
-        public async void Print(bool printDialog)
+        public async void PrintAsync(bool printDialog)
         {
             if (PrinterViewModel.CodeTextBoxText.Length < 1)
             {
@@ -88,24 +93,23 @@ namespace PrinterApp
 
             if (PrinterViewModel.CodeTextBoxText.ToUpper() == "IDDQD")
             {
-                using (var wc = new WebClient())
-                {
-                    var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar +
-                                       "iddqd.pdf";
-                    saveFilePath =
-                        saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
-                    wc.DownloadFileCompleted += async (o, args) =>
-                    {
-                        await Print(saveFilePath, new PrintOptions("", 1, false),
-                            patchFrom: "");
-                    };
-                    wc.DownloadFileAsync(
-                        new Uri("https://cdn.profcomff.com/app/printer/iddqd.pdf"),
-                        saveFilePath);
-                }
-
+                var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar +
+                                   "iddqd.pdf";
+                saveFilePath =
+                    saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
+                ShowComplement();
+                using var client = new HttpClient();
+                await using var s =
+                    await client.GetStreamAsync("https://cdn.profcomff.com/app/printer/iddqd.pdf");
+                await using var fs = new FileStream(saveFilePath, FileMode.OpenOrCreate);
+                await s.CopyToAsync(fs);
+                PrintFile(saveFilePath, new PrintOptions("", 1, false),
+                    patchFrom: "");
                 PrinterViewModel.CodeTextBoxText = "";
-                Log.Information($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Easter");
+                PrinterViewModel.DownloadNotInProgress = true;
+                Log.Information(
+                    $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Easter");
+
                 return;
             }
 
@@ -120,7 +124,7 @@ namespace PrinterApp
                     await httpClient.GetAsync($"{FileUrl}/{PrinterViewModel.CodeTextBoxText}");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    await Marketing.CheckCode(
+                    Marketing.CheckCode(
                         statusOk: true,
                         pathFrom: patchFrom);
 
@@ -128,26 +132,25 @@ namespace PrinterApp
                     {
                         PrinterViewModel.CodeTextBoxText = "";
                         var responseBody = await response.Content.ReadAsStringAsync();
-                        //ReceiveOutput
-                        var receiveOutput =
+                        var fileWithOptions =
                             JsonConvert.DeserializeObject<ReceiveOutput>(responseBody);
 
-                        if (receiveOutput != null && receiveOutput.Filename.Length > 0)
+                        if (fileWithOptions != null && fileWithOptions.Filename.Length > 0)
                         {
                             DeleteOldFiles();
-                            await Marketing.StartDownload(
+                            Marketing.StartDownload(
                                 pathFrom: patchFrom,
-                                pathTo: $"{StaticUrl}/{receiveOutput.Filename}");
-                            Download(receiveOutput, patchFrom, printDialog);
+                                pathTo: $"{StaticUrl}/{fileWithOptions.Filename}");
+                            await Download(fileWithOptions, patchFrom, printDialog);
                         }
                         else
                         {
-                            await Marketing.PrintNotFile(pathFrom: patchFrom);
+                            Marketing.PrintNotFile(pathFrom: patchFrom);
                         }
                     }
                     catch (Exception exception)
                     {
-                        await Marketing.DownloadException(status: exception.Message,
+                        Marketing.DownloadException(status: exception.Message,
                             pathFrom: patchFrom);
 
                         Log.Error(
@@ -159,7 +162,7 @@ namespace PrinterApp
                 else if (response.StatusCode is HttpStatusCode.NotFound
                          or HttpStatusCode.UnsupportedMediaType)
                 {
-                    await Marketing.CheckCode(statusOk: false, pathFrom: patchFrom);
+                    Marketing.CheckCode(statusOk: false, pathFrom: patchFrom);
 
                     PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
                     PrinterViewModel.ErrorTextBlockText = CodeError;
@@ -167,7 +170,7 @@ namespace PrinterApp
             }
             catch (Exception exception)
             {
-                await Marketing.PrintException(status: exception.Message, pathFrom: patchFrom);
+                Marketing.PrintException(status: exception.Message, pathFrom: patchFrom);
 
                 Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
                 PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
@@ -185,40 +188,28 @@ namespace PrinterApp
             return PrinterViewModel.CodeTextBoxText != _configFile.ExitCode.ToUpper();
         }
 
-        private void Download(ReceiveOutput receiveOutput, string patchFrom, bool printDialog =
-            false)
-
+        private async Task Download(ReceiveOutput fileWithOptions, string patchFrom,
+            bool printDialog = false)
         {
             Log.Debug(
-                $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Start download filename:{receiveOutput.Filename}");
-            using (var wc = new WebClient())
-            {
-                var name = Guid.NewGuid() + ".pdf";
-                var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar + name;
-                saveFilePath = saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
-                PrinterViewModel.ProgressBarVisibility = Visibility.Visible;
-                wc.DownloadProgressChanged += DownloadProgressChanged;
-                wc.DownloadFileCompleted += async (sender, args) =>
-                {
-                    await Marketing.FinishDownload(pathFrom: patchFrom,
-                        pathTo: $"{StaticUrl}/{receiveOutput.Filename}");
-                    PrinterViewModel.ProgressBarVisibility = Visibility.Collapsed;
-                    await Print(saveFilePath, receiveOutput.Options, patchFrom, printDialog);
-                };
-                wc.DownloadFileAsync(new Uri($"{StaticUrl}/{receiveOutput.Filename}"),
-                    saveFilePath);
-            }
-
+                $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Start download filename:{fileWithOptions.Filename}");
+            var name = Guid.NewGuid() + ".pdf";
+            var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar + name;
+            saveFilePath = saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
+            ShowComplement();
+            using var client = new HttpClient();
+            await using var s =
+                await client.GetStreamAsync($"{StaticUrl}/{fileWithOptions.Filename}");
+            await using var fs = new FileStream(saveFilePath, FileMode.OpenOrCreate);
+            await s.CopyToAsync(fs);
+            Marketing.FinishDownload(pathFrom: patchFrom,
+                pathTo: $"{StaticUrl}/{fileWithOptions.Filename}");
             Log.Debug(
-                $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: End download filename:{receiveOutput.Filename}");
+                $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: End download filename:{fileWithOptions.Filename}");
+            PrintFile(saveFilePath, fileWithOptions.Options, patchFrom, printDialog);
         }
 
-        private void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            PrinterViewModel.ProgressBarValue = e.ProgressPercentage;
-        }
-
-        private async Task Print(string saveFilePath, PrintOptions options, string patchFrom,
+        private void PrintFile(string saveFilePath, PrintOptions options, string patchFrom,
             bool printDialog = false)
         {
             var sumatraPath = SearchSumatraPdf();
@@ -248,9 +239,7 @@ namespace PrinterApp
                     Arguments = $"{arguments} {saveFilePath}"
                 };
 
-                ShowComplement();
-
-                await Marketing.StartSumatra(pathFrom: patchFrom);
+                Marketing.StartSumatra(pathFrom: patchFrom);
 
                 Process currentProcess = new() { StartInfo = startInfo };
                 var _ = currentProcess.Start();
@@ -275,11 +264,14 @@ namespace PrinterApp
                 $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: delete all files complete");
         }
 
-        private async Task ShowComplement()
+        private void ShowComplement()
         {
-            PrinterViewModel.Compliment = Compliments.GetRandomCompliment();
-            await Task.Delay(4000);
-            PrinterViewModel.Compliment = "";
+            new Task(async () =>
+            {
+                PrinterViewModel.Compliment = Compliments.GetRandomCompliment();
+                await Task.Delay(5000);
+                PrinterViewModel.Compliment = "";
+            }).Start();
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace PrinterApp
 {
@@ -22,96 +21,105 @@ namespace PrinterApp
         private static readonly string AssemblyVersion =
             Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty;
 
-        private static async Task Post(string action, string status, string pathFrom,
+        private static void Post(string action, string status, string pathFrom,
             string pathTo)
         {
             var body = new MarketingBody(action: action,
                 additional_data:
                 $"{{\"status\": \"{status}\",\"app_version\": \"{AssemblyVersion}\"}}",
                 path_from: pathFrom, path_to: pathTo);
-            await SharedClient.PostAsJsonAsync("action", body);
+            SharedClient.PostAsJsonAsync("action", body);
         }
 
-        public static async Task StartDownload(string pathFrom,
+        public static void StartDownload(string pathFrom,
             string pathTo)
         {
-            await Post(
+            Post(
                 action: "print terminal start download file",
                 status: "start_download",
                 pathFrom: pathFrom,
                 pathTo: pathTo);
         }
 
-        public static async Task DownloadException(string pathFrom,
+        public static void DownloadException(string pathFrom,
             string status)
         {
-            await Post(
+            Post(
                 action: "print terminal download exception",
                 status: status,
                 pathFrom: pathFrom,
                 pathTo: "");
         }
 
-        public static async Task FinishDownload(string pathFrom,
+        public static void FinishDownload(string pathFrom,
             string pathTo)
         {
-            await Post(
+            Post(
                 action: "print terminal finish download file",
                 status: "finish_download",
                 pathFrom: pathFrom,
                 pathTo: pathTo);
         }
 
-        public static async Task PrintException(string pathFrom,
+        public static void PrintException(string pathFrom,
             string status)
         {
-            await Post(
+            Post(
                 action: "print terminal print exception",
                 status: status,
                 pathFrom: pathFrom,
                 pathTo: "");
         }
 
-        public static async Task PrintNotFile(string pathFrom)
+        public static void PrintNotFile(string pathFrom)
         {
-            await Post(
+            Post(
                 action: "print terminal check filename",
                 status: "not_file",
                 pathFrom: pathFrom,
                 pathTo: "");
         }
 
-        public static async Task CheckCode(string pathFrom,
+        public static void CheckCode(string pathFrom,
             bool statusOk)
         {
-            await Post(
+            Post(
                 action: "print terminal check code",
                 status: $"{(statusOk ? "check_code_ok" : "check_code_fail")}",
                 pathFrom: pathFrom,
                 pathTo: "");
         }
 
-        public static async Task StartSumatra(string pathFrom)
+        public static void StartSumatra(string pathFrom)
         {
-            await Post(
+            Post(
                 action: "print terminal start sumatra",
                 status: "start_sumatra",
                 pathFrom: pathFrom,
                 pathTo: "");
         }
 
-        public static async Task LoadProgram()
+        public static void LoadProgram()
         {
-            await Post(
+            Post(
                 action: "print terminal load",
                 status: "ok",
                 pathFrom: "",
                 pathTo: "");
         }
 
-        public static async Task UpdateDownloaded()
+        public static void CloseWithoutAccessProgram()
         {
-            await Post(
+            Post(
+                action: "print terminal attempt to close without access",
+                status: "ok",
+                pathFrom: "",
+                pathTo: "");
+        }
+
+        public static void UpdateDownloaded()
+        {
+            Post(
                 action: "print terminal update download",
                 status: "ok",
                 pathFrom: "",

@@ -64,7 +64,8 @@ namespace PrinterApp
                         if (_printerModel.PrinterViewModel.FlakesCanvasLeft[i] > RootCanvas.Width)
                         {
                             _printerModel.PrinterViewModel.FlakesCanvasLeft[i] =
-                                RootCanvas.Width - _printerModel.PrinterViewModel.FlakesCanvasLeft[i];
+                                RootCanvas.Width -
+                                _printerModel.PrinterViewModel.FlakesCanvasLeft[i];
                         }
                         else if (_printerModel.PrinterViewModel.FlakesCanvasLeft[i] < 0)
                         {
@@ -75,7 +76,8 @@ namespace PrinterApp
                             if (Math.Abs(_printerModel.PrinterViewModel.FlakesCanvasLeft[i] -
                                          _flakesTargetsCanvasLeft[i]) < 0.4)
                             {
-                                _flakesTargetsCanvasLeft[i] = RootCanvas.Width * _random.NextDouble();
+                                _flakesTargetsCanvasLeft[i] =
+                                    RootCanvas.Width * _random.NextDouble();
                             }
 
                             _printerModel.PrinterViewModel.FlakesCanvasLeft[i] +=
@@ -152,7 +154,7 @@ namespace PrinterApp
         {
             if (sender is Button button)
             {
-                _printerModel.Print(button.Name == "Print2");
+                _printerModel.PrintAsync(button.Name == "Print2");
             }
         }
 
@@ -161,6 +163,7 @@ namespace PrinterApp
             if (_printerModel.WrongExitCode())
             {
                 _autoUpdater.StopTimer();
+                Marketing.CloseWithoutAccessProgram();
                 Log.Information(
                     $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Attempt to close without access");
                 Log.Information(
@@ -178,19 +181,17 @@ namespace PrinterApp
         private void UIElement_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key != Key.Enter) return;
-            _printerModel.Print( /*button.Name == "Print2"*/false);
+            _printerModel.PrintAsync( /*button.Name == "Print2"*/false);
             e.Handled = true;
         }
-
-        private Timer _newYearTimer;
 
         private readonly DispatcherTimer _newYearDispatcherTimer =
             new() { Interval = new TimeSpan(0, 0, 0, 0, 23) };
 
         private void SetNewYearTimer()
         {
-            _newYearTimer = new Timer();
-            _newYearTimer.Elapsed += (_, _) =>
+           var newYearTimer = new Timer();
+            newYearTimer.Elapsed += (_, _) =>
             {
                 if (DateTime.Now > new DateTime(DateTime.Now.Year, 11, 30) &&
                     DateTime.Now < new DateTime(DateTime.Now.Year + 1, 2, 1))
@@ -210,8 +211,8 @@ namespace PrinterApp
                     }
                 }
             };
-            _newYearTimer.Interval = 24 * 60 * 60 * 1000;
-            _newYearTimer.Start();
+            newYearTimer.Interval = 24 * 60 * 60 * 1000;
+            newYearTimer.Start();
         }
     }
 }
