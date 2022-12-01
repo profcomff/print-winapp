@@ -190,29 +190,33 @@ namespace PrinterApp
 
         private void SetNewYearTimer()
         {
-           var newYearTimer = new Timer();
-            newYearTimer.Elapsed += (_, _) =>
-            {
-                if (DateTime.Now > new DateTime(DateTime.Now.Year, 11, 30) &&
-                    DateTime.Now < new DateTime(DateTime.Now.Year + 1, 2, 1))
-                {
-                    if (!_newYearDispatcherTimer.IsEnabled)
-                    {
-                        _printerModel.PrinterViewModel.FlakesVisibility = Visibility.Visible;
-                        _newYearDispatcherTimer.Start();
-                    }
-                }
-                else
-                {
-                    if (_newYearDispatcherTimer.IsEnabled)
-                    {
-                        _printerModel.PrinterViewModel.FlakesVisibility = Visibility.Collapsed;
-                        _newYearDispatcherTimer.Stop();
-                    }
-                }
-            };
-            newYearTimer.Interval = 24 * 60 * 60 * 1000;
+            NewYearTimerOnElapsed(null, null!);
+            var newYearTimer = new Timer();
+            newYearTimer.Elapsed += NewYearTimerOnElapsed;
+            //check every 12 hours
+            newYearTimer.Interval = 12 * 60 * 60 * 1000;
             newYearTimer.Start();
+        }
+
+        private void NewYearTimerOnElapsed(object? sender, ElapsedEventArgs e)
+        {
+            if (DateTime.Now > new DateTime(DateTime.Now.Year, 11, 30) &&
+                DateTime.Now < new DateTime(DateTime.Now.Year + 1, 2, 1))
+            {
+                if (!_newYearDispatcherTimer.IsEnabled)
+                {
+                    _printerModel.PrinterViewModel.FlakesVisibility = Visibility.Visible;
+                    _newYearDispatcherTimer.Start();
+                }
+            }
+            else
+            {
+                if (_newYearDispatcherTimer.IsEnabled)
+                {
+                    _printerModel.PrinterViewModel.FlakesVisibility = Visibility.Collapsed;
+                    _newYearDispatcherTimer.Stop();
+                }
+            }
         }
     }
 }
