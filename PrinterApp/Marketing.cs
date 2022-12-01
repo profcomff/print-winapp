@@ -125,5 +125,14 @@ namespace PrinterApp
                 pathFrom: "",
                 pathTo: "");
         }
+
+        public static void ManualUpdate()
+        {
+            Post(
+                action: "print terminal manual update",
+                status: "ok",
+                pathFrom: "",
+                pathTo: "");
+        }
     }
 }

@@ -50,6 +50,14 @@ public class AutoUpdater
         _dispatcherTimer.Stop();
     }
 
+    public void ManualUpdate()
+    {
+        Log.Information(
+            $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Manual update");
+        Marketing.ManualUpdate();
+        new Task(async () => await CheckNewVersion()).Start();
+    }
+
     private async void DispatcherTimer_Tick(object? sender, EventArgs e)
     {
         var timeNow = DateTime.Now.TimeOfDay;

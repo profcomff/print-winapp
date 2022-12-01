@@ -1,6 +1,6 @@
 ﻿using Serilog;
 using System;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Timers;
@@ -158,20 +158,26 @@ namespace PrinterApp
             }
         }
 
-        private void MainWindow_OnClosed(object sender, EventArgs e)
+        private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
         {
+            if (_printerModel.PrinterViewModel.CodeTextBoxText == "UPDATE")
+            {
+                _printerModel.PrinterViewModel.CodeTextBoxText = "";
+                _autoUpdater.ManualUpdate();
+                e.Cancel = true;
+                return;
+            }
+
             if (_printerModel.WrongExitCode())
             {
-                _autoUpdater.StopTimer();
                 Marketing.CloseWithoutAccessProgram();
                 Log.Information(
                     $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Attempt to close without access");
-                Log.Information(
-                    $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Start {Environment.ProcessPath!}");
-                Process.Start(Environment.ProcessPath!);
-                Log.CloseAndFlush();
-                Environment.Exit(0);
+                e.Cancel = true;
+                return;
             }
+
+            _autoUpdater.StopTimer();
         }
 
         private void ManualPrint_OnClick(object sender, RoutedEventArgs e)
