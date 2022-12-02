@@ -12,6 +12,7 @@ namespace PrinterApp
         public string TempSavePath { get; set; } = Path.GetTempPath() + ".printerApp";
         public bool StartWithWindows { get; set; } = false;
         public bool AutoUpdate { get; set; } = true;
+        public string AuthorizationToken { get; set; } = "token";
 
         public void LoadConfig(string fileName)
         {
@@ -35,6 +36,7 @@ namespace PrinterApp
                         TempSavePath = config.TempSavePath;
                         StartWithWindows = config.StartWithWindows;
                         AutoUpdate = config.AutoUpdate;
+                        AuthorizationToken = config.AuthorizationToken;
                         WriteConfig(configPath);
                         Log.Debug("Load from config file\n" +
                                   JsonConvert.SerializeObject(this, Formatting.Indented));

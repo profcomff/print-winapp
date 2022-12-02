@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
@@ -33,6 +34,7 @@ namespace PrinterApp
         public PrinterViewModel PrinterViewModel { get; } = new();
 
         private readonly ConfigFile _configFile;
+        private readonly HttpClient _httpClient;
 
         public PrinterModel(ConfigFile configFile)
         {
@@ -41,6 +43,10 @@ namespace PrinterApp
             ServicePointManager.SecurityProtocol =
                 SecurityProtocolType.Tls |
                 SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
+            _httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("token", _configFile.AuthorizationToken);
 
             if (!Directory.Exists(_configFile.TempSavePath))
                 Directory.CreateDirectory(_configFile.TempSavePath);
@@ -98,9 +104,9 @@ namespace PrinterApp
                 saveFilePath =
                     saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
                 ShowComplement();
-                using var client = new HttpClient();
                 await using var s =
-                    await client.GetStreamAsync("https://cdn.profcomff.com/app/printer/iddqd.pdf");
+                    await _httpClient.GetStreamAsync(
+                        "https://cdn.profcomff.com/app/printer/iddqd.pdf");
                 await using var fs = new FileStream(saveFilePath, FileMode.OpenOrCreate);
                 await s.CopyToAsync(fs);
                 PrintFile(saveFilePath, new PrintOptions("", 1, false),
@@ -117,11 +123,10 @@ namespace PrinterApp
                 $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Start response code {PrinterViewModel.CodeTextBoxText}");
             var patchFrom = $"{FileUrl}/{PrinterViewModel.CodeTextBoxText}";
             PrinterViewModel.DownloadNotInProgress = false;
-            var httpClient = new HttpClient();
             try
             {
                 var response =
-                    await httpClient.GetAsync($"{FileUrl}/{PrinterViewModel.CodeTextBoxText}");
+                    await _httpClient.GetAsync($"{FileUrl}/{PrinterViewModel.CodeTextBoxText}");
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     Marketing.CheckCode(
@@ -197,9 +202,8 @@ namespace PrinterApp
             var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar + name;
             saveFilePath = saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
             ShowComplement();
-            using var client = new HttpClient();
             await using var s =
-                await client.GetStreamAsync($"{StaticUrl}/{fileWithOptions.Filename}");
+                await _httpClient.GetStreamAsync($"{StaticUrl}/{fileWithOptions.Filename}");
             await using var fs = new FileStream(saveFilePath, FileMode.OpenOrCreate);
             await s.CopyToAsync(fs);
             Marketing.FinishDownload(pathFrom: patchFrom,
