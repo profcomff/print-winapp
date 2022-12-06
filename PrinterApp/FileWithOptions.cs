@@ -1,8 +1,8 @@
 ﻿namespace PrinterApp
 {
-    public class ReceiveOutput
+    public class FileWithOptions
     {
-        public ReceiveOutput(string filename, PrintOptions options)
+        public FileWithOptions(string filename, PrintOptions options)
         {
             Filename = filename;
             Options = options;

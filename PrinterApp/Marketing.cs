@@ -134,5 +134,14 @@ namespace PrinterApp
                 pathFrom: "",
                 pathTo: "");
         }
+
+        public static void SocketException(string status)
+        {
+            Post(
+                action: "print terminal socket exception",
+                status: status,
+                pathFrom: "",
+                pathTo: "");
+        }
     }
 }
