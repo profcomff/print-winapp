@@ -41,12 +41,14 @@ namespace PrinterApp
         public PrinterViewModel PrinterViewModel { get; } = new();
 
         private readonly ConfigFile _configFile;
+        private readonly AutoUpdater _autoUpdater;
         private readonly HttpClient _httpClient;
         private bool _socketClose;
 
-        public PrinterModel(ConfigFile configFile)
+        public PrinterModel(ConfigFile configFile, AutoUpdater autoUpdater)
         {
             _configFile = configFile;
+            _autoUpdater = autoUpdater;
 
             ServicePointManager.SecurityProtocol =
                 SecurityProtocolType.Tls |
@@ -374,6 +376,11 @@ namespace PrinterApp
             {
                 Marketing.SocketException("websocketReceiveOptions is null");
                 return;
+            }
+
+            if (websocketReceiveOptions.ManualUpdate)
+            {
+                _autoUpdater.ManualUpdate();
             }
 
             if (websocketReceiveOptions.QrToken == null!)

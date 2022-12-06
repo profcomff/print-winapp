@@ -27,7 +27,7 @@ namespace PrinterApp
         {
             ConfigFile configFile = new();
             configFile.LoadConfig(GetType().Namespace!);
-            _printerModel = new PrinterModel(configFile);
+            _printerModel = new PrinterModel(configFile, _autoUpdater);
             for (var i = 0; i < FlakesCount; i++)
             {
                 _printerModel.PrinterViewModel.FlakesCanvasTop.Add(0);
