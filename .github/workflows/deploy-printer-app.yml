@@ -18,7 +18,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 7.0.x
 
       - run: dotnet restore ${{ env.PROJECT_PATH }}
 
@@ -28,7 +28,7 @@ jobs:
         uses: thedoctor0/zip-release@main
         with:
           type: 'zip'
-          directory: 'PrinterApp/bin/Release/net6.0-windows/win-x86/publish/'
+          directory: 'PrinterApp/bin/Release/net7.0-windows/win-x86/publish/'
           filename: 'PrinterApp_x86.zip'
           exclusions: '*.pdb'
 
@@ -43,5 +43,5 @@ jobs:
       - uses: csexton/release-asset-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          file: 'PrinterApp/bin/Release/net6.0-windows/win-x86/publish/PrinterApp_x86.zip'
+          file: 'PrinterApp/bin/Release/net7.0-windows/win-x86/publish/PrinterApp_x86.zip'
           release-url: ${{ steps.create_release.outputs.upload_url }}
