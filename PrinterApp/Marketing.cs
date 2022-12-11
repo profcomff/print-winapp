@@ -108,6 +108,15 @@ namespace PrinterApp
                 pathTo: "");
         }
 
+        public static void MainWindowLoaded()
+        {
+            Post(
+                action: "print terminal main window loaded",
+                status: "ok",
+                pathFrom: "",
+                pathTo: "");
+        }
+
         public static void CloseWithoutAccessProgram()
         {
             Post(
@@ -135,11 +144,29 @@ namespace PrinterApp
                 pathTo: "");
         }
 
+        public static void ManualReboot()
+        {
+            Post(
+                action: "print terminal manual reboot",
+                status: "ok",
+                pathFrom: "",
+                pathTo: "");
+        }
+
         public static void SocketException(string status)
         {
             Post(
                 action: "print terminal socket exception",
                 status: status,
+                pathFrom: "",
+                pathTo: "");
+        }
+
+        public static void SocketConnected()
+        {
+            Post(
+                action: "print terminal socket connected",
+                status: "ok",
                 pathFrom: "",
                 pathTo: "");
         }

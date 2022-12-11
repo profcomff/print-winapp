@@ -1,6 +1,5 @@
 ﻿using Serilog;
 using System;
-using System.ComponentModel;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Timers;
@@ -16,18 +15,16 @@ namespace PrinterApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly PrinterModel _printerModel;
         private readonly Regex _regex = new("[a-zA-Z0-9]{0,8}");
-        private readonly AutoUpdater _autoUpdater = new();
         private readonly Random _random = new(Guid.NewGuid().GetHashCode());
         private const int FlakesCount = 12;
         private readonly double[] _flakesTargetsCanvasLeft = new double[FlakesCount];
+        private readonly PrinterModel _printerModel;
 
-        public MainWindow()
+        public MainWindow(PrinterModel printerModel)
         {
-            ConfigFile configFile = new();
-            configFile.LoadConfig(GetType().Namespace!);
-            _printerModel = new PrinterModel(configFile, _autoUpdater);
+            _printerModel = printerModel;
+
             for (var i = 0; i < FlakesCount; i++)
             {
                 _printerModel.PrinterViewModel.FlakesCanvasTop.Add(0);
@@ -37,7 +34,7 @@ namespace PrinterApp
             Loaded += (_, _) =>
             {
                 MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
-                if (configFile.AutoUpdate) _autoUpdater.StartTimer();
+
                 SetNewYearTimer();
                 for (var i = 0; i < FlakesCount; i++)
                 {
@@ -91,7 +88,7 @@ namespace PrinterApp
             };
             DataContext = _printerModel.PrinterViewModel;
             InitializeComponent();
-            //TODO what this?
+            //what this?
             if (40 + Height < SystemParameters.PrimaryScreenHeight)
                 Top = 40;
             Left = SystemParameters.PrimaryScreenWidth - 20 - Width;
@@ -102,6 +99,7 @@ namespace PrinterApp
             Topmost = false;
             ShowInTaskbar = true;
 #endif
+            Marketing.MainWindowLoaded();
         }
 
         private bool IsTextAllowed(string text)
@@ -156,29 +154,6 @@ namespace PrinterApp
             {
                 _printerModel.PrintAsync(button.Name == "Print2");
             }
-        }
-
-        private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
-        {
-            if (_printerModel.PrinterViewModel.CodeTextBoxText == "UPDATE")
-            {
-                _printerModel.PrinterViewModel.CodeTextBoxText = "";
-                _autoUpdater.ManualUpdate();
-                e.Cancel = true;
-                return;
-            }
-
-            if (_printerModel.WrongExitCode())
-            {
-                Marketing.CloseWithoutAccessProgram();
-                Log.Information(
-                    $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Attempt to close without access");
-                e.Cancel = true;
-                return;
-            }
-
-            _printerModel.SocketsClose();
-            _autoUpdater.StopTimer();
         }
 
         private void UIElement_OnKeyDown(object sender, KeyEventArgs e)

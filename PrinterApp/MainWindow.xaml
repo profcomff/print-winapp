@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:PrinterApp"
         mc:Ignorable="d"
         Title="PrintApp" Height="900" Width="1600"
-        Closing="MainWindow_OnClosing"
         FontFamily="/PrinterApp;component/Fonts/#Roboto"
         WindowState="Maximized"
         WindowStyle="None"
