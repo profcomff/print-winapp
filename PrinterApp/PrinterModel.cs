@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -361,12 +361,9 @@ namespace PrinterApp
                 Marketing.SocketException(status: exception.Message);
                 Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
                 PrinterViewModel.PrintQr = null!;
-                if (socket.State == WebSocketState.Aborted ||
-                    socket.State == WebSocketState.Closed && socket.CloseStatus == null)
-                {
+                socket.Abort();
                     await Task.Delay(5000);
                     SocketsStartAsync();
-                }
             }
         }
 
