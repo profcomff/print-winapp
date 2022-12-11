@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -45,6 +45,10 @@ namespace PrinterApp
         private readonly HttpClient _httpClient;
         private bool _socketClose;
 
+        public delegate void RebootHandler();
+
+        public event RebootHandler? Reboot;
+
         public PrinterModel(ConfigFile configFile, AutoUpdater autoUpdater)
         {
             _configFile = configFile;
@@ -58,14 +62,6 @@ namespace PrinterApp
             _httpClient.DefaultRequestHeaders.Authorization
                 = new AuthenticationHeaderValue("token", _configFile.AuthorizationToken);
 
-            if (!Directory.Exists(_configFile.TempSavePath))
-                Directory.CreateDirectory(_configFile.TempSavePath);
-
-            var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
-                "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-            var str = Environment.ProcessPath ?? string.Empty;
-            key?.SetValue(GetType().Namespace, _configFile.StartWithWindows ? str : string.Empty);
-
             if (SearchSumatraPdf() == "")
             {
                 MessageBox.Show(SumatraError);
@@ -73,8 +69,6 @@ namespace PrinterApp
             }
 
             SocketsStartAsync();
-
-            Marketing.LoadProgram();
         }
 
         private static string SearchSumatraPdf()
@@ -333,6 +327,7 @@ namespace PrinterApp
                     return;
                 }
 
+                Marketing.SocketConnected();
                 _socketClose = false;
                 var buffer = new byte[128 * 1024];
                 while (!_socketClose)
@@ -362,8 +357,8 @@ namespace PrinterApp
                 Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
                 PrinterViewModel.PrintQr = null!;
                 socket.Abort();
-                    await Task.Delay(5000);
-                    SocketsStartAsync();
+                await Task.Delay(5000);
+                SocketsStartAsync();
             }
         }
 
@@ -378,6 +373,11 @@ namespace PrinterApp
             if (websocketReceiveOptions.ManualUpdate)
             {
                 _autoUpdater.ManualUpdate();
+            }
+
+            if (websocketReceiveOptions.Reboot)
+            {
+                Application.Current.Dispatcher.Invoke(() => { Reboot?.Invoke(); });
             }
 
             if (websocketReceiveOptions.QrToken == null!)
