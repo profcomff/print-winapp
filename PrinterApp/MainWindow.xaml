@@ -12,7 +12,7 @@
         ResizeMode="NoResize"
         Topmost="True"
         ShowInTaskbar="False"
-        d:DataContext="{d:DesignInstance local:PrinterViewModel}">
+        d:DataContext="{d:DesignInstance local:PrinterViewModel}" Focusable="False">
     <Viewbox Stretch="Fill" KeyDown="UIElement_OnKeyDown">
         <Canvas x:Name="RootCanvas" Background="{DynamicResource App.Background}" Height="900" Width="1600">
             <Canvas Height="900" Width="1600" Visibility="{Binding FlakesVisibility}">
@@ -43,11 +43,12 @@
             </Canvas>
             <Image Width="212" Height="212" Source="{Binding PrintQr}" HorizontalAlignment="Left"
                    VerticalAlignment="Top" Canvas.Left="219" Canvas.Top="485"
-                   Visibility="{Binding PrintQrVisibility}" />
+                   Visibility="{Binding PrintQrVisibility}" Focusable="False" />
             <Rectangle Width="3" Height="590" Canvas.Left="684" Canvas.Top="155"
-                       Fill="{DynamicResource Labels.Foreground}" />
+                       Fill="{DynamicResource Labels.Foreground}" Focusable="False" />
             <TextBlock FontSize="24" Width="641" Height="449" Canvas.Left="814" Canvas.Top="57" TextWrapping="Wrap"
-                       Foreground="{DynamicResource Labels.Foreground}" FontFamily="Roboto" FontWeight="Bold">
+                       Foreground="{DynamicResource Labels.Foreground}" FontFamily="Roboto" FontWeight="Bold"
+                       Focusable="False">
                 <Run
                     Text="0) Подключись со своего устройства к интернету. Можно воспользоваться сетями Wi-Fi в холле ЦФА или гостевым Wi-Fi PKFF_Free. " />
                 <LineBreak />
@@ -59,24 +60,25 @@
             </TextBlock>
             <TextBlock Text="Приложение Твой ФФ!" FontSize="24" Width="256" Height="28" Canvas.Left="854"
                        Canvas.Top="540" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
-                       FontWeight="Bold" />
+                       FontWeight="Bold" Focusable="False" />
             <TextBlock Text="Бот принтера ВК" FontSize="24" Width="189" Height="28" Canvas.Left="1208"
                        Canvas.Top="540"
-                       TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold" />
+                       TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold"
+                       Focusable="False" />
             <TextBlock Text="app.profcomff.com" FontSize="24" Width="209" Height="28" Canvas.Left="878"
                        Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
-                       FontWeight="Bold" />
+                       FontWeight="Bold" Focusable="False" />
             <TextBlock Text="vk.me/profcomff_print_bot" FontSize="24" Width="290" Height="28" Canvas.Left="1158"
                        Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
-                       FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                       FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Focusable="False" />
             <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.AppProfcomffCom}" Canvas.Left="876"
-                       Canvas.Top="591" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                       Canvas.Top="591" HorizontalAlignment="Center" VerticalAlignment="Top" Focusable="False" />
             <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.ProfcomffPrint}" Canvas.Left="1197"
-                       Canvas.Top="591" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                       Canvas.Top="591" HorizontalAlignment="Left" VerticalAlignment="Center" Focusable="False" />
             <TextBlock Text="{Binding Compliment}" TextWrapping="Wrap"
                        Foreground="{DynamicResource Labels.Foreground}" FontFamily="Roboto" FontWeight="Bold"
                        FontSize="24" Canvas.Left="120" Canvas.Top="485" Height="152" Width="410"
-                       HorizontalAlignment="Left" VerticalAlignment="Top" />
+                       HorizontalAlignment="Left" VerticalAlignment="Top" Focusable="False" />
             <Grid Canvas.Left="120" Canvas.Top="263" Width="410">
                 <TextBlock Text="Код документа для печати" FontSize="24" TextWrapping="Wrap"
                            Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold" Margin="0,0,104,158" />
@@ -88,7 +90,7 @@
                          IsEnabled="{Binding DownloadNotInProgress}"
                          TextAlignment="Center" Style="{DynamicResource MyTextBoxStyle1}"
                          VerticalContentAlignment="Center"
-                         HorizontalContentAlignment="Center" Margin="0,29,0,105" />
+                         HorizontalContentAlignment="Center" Margin="0,29,0,105" TabIndex="1" />
                 <TextBlock IsHitTestVisible="False" Text="Введите код здесь" VerticalAlignment="Top"
                            HorizontalAlignment="Center" Margin="0,41,0,0" Foreground="DarkGray" FontSize="24">
                     <TextBlock.Style>
@@ -107,9 +109,9 @@
                        Background="Red" Foreground="White"
                        Content="{Binding ErrorTextBlockText, FallbackValue=123}"
                        Padding="0,0,0,0" Margin="0,157,0,0" Visibility="{Binding ErrorTextBlockVisibility}" />
-                <Button Content="Распечатать сразу" Click="Print_OnClick"
+                <Button x:Name="ButtonPrint" Content="Распечатать сразу" Click="Print_OnClick"
                         Style="{DynamicResource MyButtonStyle}" FontSize="20"
-                        IsEnabled="{Binding DownloadNotInProgress}" Margin="0,92,0,42" />
+                        IsEnabled="{Binding DownloadNotInProgress}" Margin="0,92,0,42" Focusable="True" TabIndex="2" />
             </Grid>
         </Canvas>
     </Viewbox>

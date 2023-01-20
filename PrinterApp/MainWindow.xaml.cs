@@ -99,6 +99,7 @@ namespace PrinterApp
             Topmost = false;
             ShowInTaskbar = true;
 #endif
+            _printerModel.PrintAsyncCompleteEvent += () => { CodeBox.Focus(); };
             Marketing.MainWindowLoaded();
         }
 

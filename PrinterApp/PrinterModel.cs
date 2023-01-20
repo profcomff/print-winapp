@@ -49,6 +49,10 @@ namespace PrinterApp
 
         public event RebootHandler? Reboot;
 
+        public delegate void PrintAsyncCompleteHandler();
+
+        public event PrintAsyncCompleteHandler? PrintAsyncCompleteEvent;
+
         public PrinterModel(ConfigFile configFile, AutoUpdater autoUpdater)
         {
             _configFile = configFile;
@@ -191,6 +195,7 @@ namespace PrinterApp
             PrinterViewModel.DownloadNotInProgress = true;
             Log.Debug(
                 $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: End response code {PrinterViewModel.CodeTextBoxText}");
+            PrintAsyncCompleteEvent?.Invoke();
         }
 
         public bool WrongExitCode()

@@ -87,6 +87,7 @@ namespace PrinterApp
                 return;
             }
 
+            Marketing.ManualShutdown();
             _printerModel.SocketsClose();
             _autoUpdater.StopTimer();
             Current.Shutdown();
