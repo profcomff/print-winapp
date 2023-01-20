@@ -153,6 +153,15 @@ namespace PrinterApp
                 pathTo: "");
         }
 
+        public static void ManualShutdown()
+        {
+            Post(
+                action: "print terminal manual shutdown",
+                status: "ok",
+                pathFrom: "",
+                pathTo: "");
+        }
+
         public static void SocketException(string status)
         {
             Post(
