@@ -38,8 +38,8 @@
 
 ## Руководство по внесению изменений
 
-Программа написана под Windows на .NET 6 с использованием технологии [Windows Presentation Foundation](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/?view=netdesktop-6.0).  
-Минимально для сборки проекта понадобится установленный [Microsoft .NET 6 SDK](https://dotnet.microsoft.com/en-us/download). Для графического редактирования интерфейсов рекомендуется использовать microsoft Visual Studio Blend 2022.
+Программа написана под Windows на .NET 7 с использованием технологии [Windows Presentation Foundation](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/?view=netdesktop-6.0).  
+Минимально для сборки проекта понадобится установленный [Microsoft .NET 7 SDK](https://dotnet.microsoft.com/en-us/download). Для графического редактирования интерфейсов рекомендуется использовать microsoft Visual Studio Blend 2022.
 
 ### Работа авто-обновления
 
