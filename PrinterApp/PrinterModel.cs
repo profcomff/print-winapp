@@ -120,7 +120,7 @@ namespace PrinterApp
                         "https://cdn.profcomff.com/app/printer/iddqd.pdf");
                 await using var fs = new FileStream(saveFilePath, FileMode.OpenOrCreate);
                 await s.CopyToAsync(fs);
-                PrintFile(saveFilePath, new PrintOptions("", 1, false),
+                PrintFile(saveFilePath, new PrintOptions("", 1, false, "A4"),
                     patchFrom: "");
                 PrinterViewModel.CodeTextBoxText = "";
                 PrinterViewModel.DownloadNotInProgress = true;
@@ -246,6 +246,8 @@ namespace PrinterApp
                     {
                         arguments += $",{options.Copies}x";
                     }
+
+                    arguments += ",paper=A4";
 
                     arguments += "\"";
                 }
