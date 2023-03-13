@@ -12,21 +12,21 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Imaging;
 using QRCoder;
+using QRCoder.Xaml;
 
 namespace PrinterApp
 {
     public class PrinterModel
     {
 #if DEBUG
-        private const string FileUrl = "https://printer.api.test.profcomff.com/file";
-        private const string StaticUrl = "https://printer.api.test.profcomff.com/static";
-        private const string WebSockUrl = "wss://printer.api.test.profcomff.com/qr";
+        private const string FileUrl = "https://api.test.profcomff.com/print/file";
+        private const string StaticUrl = "https://api.test.profcomff.com/print/static";
+        private const string WebSockUrl = "wss://api.test.profcomff.com/print/qr";
 #else
-        private const string FileUrl = "https://printer.api.profcomff.com/file";
-        private const string StaticUrl = "https://printer.api.profcomff.com/static";
-        private const string WebSockUrl = "wss://printer.api.profcomff.com/qr";
+        private const string FileUrl = "https://api.profcomff.com/print/file";
+        private const string StaticUrl = "https://api.profcomff.com/print/static";
+        private const string WebSockUrl = "wss://api.profcomff.com/print/qr";
 #endif
         private const string CodeError = "Некорректный код";
         private const string HttpError = "Ошибка сети";
@@ -293,25 +293,6 @@ namespace PrinterApp
             }).Start();
         }
 
-        private static BitmapImage LoadImage(byte[] imageData)
-        {
-            if (imageData == null! || imageData.Length == 0) return null!;
-            var image = new BitmapImage();
-            using (var mem = new MemoryStream(imageData))
-            {
-                mem.Position = 0;
-                image.BeginInit();
-                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.UriSource = null;
-                image.StreamSource = mem;
-                image.EndInit();
-            }
-
-            image.Freeze();
-            return image;
-        }
-
         public void SocketsClose()
         {
             _socketClose = true;
@@ -440,11 +421,10 @@ namespace PrinterApp
                 $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: new qr code {value}");
             var qrGenerator = new QRCodeGenerator();
             var qrCodeData = qrGenerator.CreateQrCode(value, QRCodeGenerator.ECCLevel.Q);
-            var qrCode = new PngByteQRCode(qrCodeData);
-            byte[] white = { 255, 255, 255, 255 };
-            byte[] transparent = { 0, 0, 0, 0 };
-            var qrCodeImage = qrCode.GetGraphic(20, white, transparent, false);
-            PrinterViewModel.PrintQr = LoadImage(qrCodeImage);
+            var qrCode = new XamlQRCode(qrCodeData);
+            var qrCodeImage = qrCode.GetGraphic(20, "#FFFFFFFF", "#00FFFFFF", false);
+            qrCodeImage.Freeze();
+            PrinterViewModel.PrintQr = qrCodeImage;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace PrinterApp
@@ -10,7 +11,7 @@ namespace PrinterApp
         private string _codeTextBoxText = "";
         private string _errorTextBlockText = "";
         private Visibility _errorTextBlockVisibility = Visibility.Collapsed;
-        private BitmapImage _printQr = new();
+        private ImageSource _printQr = new BitmapImage();
         private Visibility _printQrVisibility = Visibility.Visible;
         private string _compliment = "";
         private Visibility _flakesVisibility = Visibility.Collapsed;
@@ -61,7 +62,7 @@ namespace PrinterApp
             }
         }
 
-        public BitmapImage PrintQr
+        public ImageSource PrintQr
         {
             get => _printQr;
             set

@@ -10,12 +10,12 @@ namespace PrinterApp
 #if DEBUG
         private static readonly HttpClient SharedClient = new HttpClient
         {
-            BaseAddress = new Uri("https://marketing.api.test.profcomff.com/v1/"),
+            BaseAddress = new Uri("https://api.test.profcomff.com/marketing/v1/"),
         };
 #else
         private static readonly HttpClient SharedClient = new HttpClient
         {
-            BaseAddress = new Uri("https://marketing.api.profcomff.com/v1/"),
+            BaseAddress = new Uri("https://api.profcomff.com/marketing/v1/"),
         };
 #endif
         private static readonly string AssemblyVersion =
