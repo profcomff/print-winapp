@@ -110,9 +110,15 @@
                        Background="Red" Foreground="White"
                        Content="{Binding ErrorTextBlockText, FallbackValue=123}"
                        Padding="0,0,0,0" Margin="0,157,0,0" Visibility="{Binding ErrorTextBlockVisibility}" />
-                <Button x:Name="ButtonPrint" Content="Распечатать сразу" Click="Print_OnClick"
+                <Button x:Name="ButtonPrint" Click="Print_OnClick"
                         Style="{DynamicResource MyButtonStyle}" FontSize="20"
-                        IsEnabled="{Binding DownloadNotInProgress}" Margin="0,92,0,42" Focusable="True" TabIndex="2" />
+                        IsEnabled="{Binding DownloadNotInProgress}" Margin="0,92,0,42" Focusable="True" TabIndex="2">
+                    <TextBlock TextAlignment="Center">
+                        <Run FontWeight="Bold">Распечатать сразу</Run>
+                        <LineBreak />
+                        <Run FontSize="18"> Для печати нажмите Enter</Run>
+                    </TextBlock>
+                </Button>
             </Grid>
         </Canvas>
     </Viewbox>
