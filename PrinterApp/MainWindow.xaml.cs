@@ -7,6 +7,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Windows.Interop;
+using System.Runtime.InteropServices;
 
 namespace PrinterApp
 {
@@ -15,6 +17,14 @@ namespace PrinterApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        [DllImport("User32.dll")]
+        private static extern short GetKeyState(int code);
+        
+        private const int WM_SYSKEYDOWN = 0x104;
+        private const int VK_F4 = 0x73;
+        private const int VK_MENU = 0x12;
+        private const int WM_KILLFOCUS = 0x8;
+        
         private readonly Regex _regex = new("[a-zA-Z0-9]{0,8}");
         private readonly Random _random = new(Guid.NewGuid().GetHashCode());
         private const int FlakesCount = 12;
@@ -196,6 +206,28 @@ namespace PrinterApp
                     _newYearDispatcherTimer.Stop();
                 }
             }
+        }
+        
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            HwndSource source = PresentationSource.FromVisual(this) as HwndSource;
+            source.AddHook(WndProc);
+        }
+        
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == WM_SYSKEYDOWN && wParam == VK_F4 && (GetKeyState(VK_MENU) & 0x8000) != 0) // блокировка ALT+F4
+                continue;
+
+
+            if (msg == WM_KILLFOCUS) {
+                this.Activate();
+            }
+
+            // Можно еще какие-нибудь обработчики добавить...
+            
+            return IntPtr.Zero;
         }
     }
 }
