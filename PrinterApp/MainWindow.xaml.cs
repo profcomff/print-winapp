@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Windows.Interop;
 
 namespace PrinterApp;
 
@@ -15,6 +16,8 @@ namespace PrinterApp;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private const int WM_KILLFOCUS = 0x8;
+
     private readonly Regex _regex = new("[a-zA-Z0-9]{0,8}");
     private readonly Random _random = new(Guid.NewGuid().GetHashCode());
     private const int FlakesCount = 12;
@@ -196,5 +199,33 @@ public partial class MainWindow : Window
                 _newYearDispatcherTimer.Stop();
             }
         }
+    }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        if (PresentationSource.FromVisual(this) is HwndSource source)
+        {
+            source.AddHook(WndProc);
+        }
+        else {
+            Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: не удалось получить хэндл окна");
+            Marketing.HwndSourceError();
+        }
+    }
+
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WM_KILLFOCUS && wParam.ToInt32() == 0)
+        {
+            handled = true;
+            MouseOperations.MouseEvent(MouseOperations.MouseEventFlags.LeftDown);
+            MouseOperations.MouseEvent(MouseOperations.MouseEventFlags.LeftUp);
+            Activate();
+            CodeBox.Focus();
+            CodeBox.CaretIndex = CodeBox.Text.Length;
+        }
+
+        return IntPtr.Zero;
     }
 }

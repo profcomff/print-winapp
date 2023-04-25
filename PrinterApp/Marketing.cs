@@ -203,4 +203,11 @@ public static class Marketing
             action: "print terminal qr generator exception",
             status: status);
     }
+    
+    public static void HwndSourceError()
+    {
+        Post(
+            action: "print terminal failed to get window HwndSource",
+            status: "error");
+    }
 }
