@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Serilog;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 
 namespace PrinterApp
@@ -22,7 +23,7 @@ namespace PrinterApp
 
         private App()
         {
-            System.Threading.Thread.CurrentThread.CurrentCulture =
+            Thread.CurrentThread.CurrentCulture =
                 System.Globalization.CultureInfo.CreateSpecificCulture("en-US");
             _memoryMonitor.StartTimer();
 
