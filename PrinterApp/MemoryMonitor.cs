@@ -92,6 +92,6 @@ public class MemoryMonitor
             _lastWarningSendSec--;
         }
 
-        Log.Information($"{currentProcessUsingMemoryMBytes} {systemAvailableMemoryMBytes}");
+        Log.Debug($"{currentProcessUsingMemoryMBytes} {systemAvailableMemoryMBytes}");
     }
 }
