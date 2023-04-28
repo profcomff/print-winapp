@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Reflection;
@@ -28,6 +28,16 @@ namespace PrinterApp
                 additional_data:
                 $"{{\"status\": \"{status}\",\"app_version\": \"{AssemblyVersion}\"}}",
                 path_from: pathFrom, path_to: pathTo);
+            SharedClient.PostAsJsonAsync("action", body);
+        }
+
+        private static void Post(string action, string status, float availableMem,
+            float currentMem)
+        {
+            var body = new MarketingBody(action: action,
+                additional_data:
+                $"{{\"status\": \"{status}\",\"available_mem\": \"{availableMem}\",\"current_mem\": \"{currentMem}\",\"app_version\": \"{AssemblyVersion}\"}}",
+                path_from: "", path_to: "");
             SharedClient.PostAsJsonAsync("action", body);
         }
 
@@ -178,6 +188,24 @@ namespace PrinterApp
                 status: "ok",
                 pathFrom: "",
                 pathTo: "");
+        }
+
+        public static void MemoryStatus(float availableMem, float currentMem)
+        {
+            Post(
+                action: "print terminal memory status",
+                status: "ok",
+                availableMem: availableMem,
+                currentMem: currentMem);
+        }
+
+        public static void MemoryStatusWarning(string status, float availableMem, float currentMem)
+        {
+            Post(
+                action: "print terminal memory status warning",
+                status: status,
+                availableMem: availableMem,
+                currentMem: currentMem);
         }
     }
 }

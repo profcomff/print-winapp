@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Serilog;
 using System.Reflection;
@@ -13,6 +13,7 @@ namespace PrinterApp
     {
         private readonly AutoUpdater _autoUpdater = new();
         private readonly ConfigFile _configFile = new();
+        private readonly MemoryMonitor _memoryMonitor = new();
         private PrinterModel _printerModel;
         private MainWindow _mainWindow;
 
@@ -21,6 +22,10 @@ namespace PrinterApp
 
         private App()
         {
+            System.Threading.Thread.CurrentThread.CurrentCulture =
+                System.Globalization.CultureInfo.CreateSpecificCulture("en-US");
+            _memoryMonitor.StartTimer();
+
             var fileName = GetType().Namespace!;
             ConfigureLogger(fileName);
             _configFile.LoadConfig(fileName);
@@ -90,6 +95,7 @@ namespace PrinterApp
             Marketing.ManualShutdown();
             _printerModel.SocketsClose();
             _autoUpdater.StopTimer();
+            _memoryMonitor.StopTimer();
             Current.Shutdown();
         }
 

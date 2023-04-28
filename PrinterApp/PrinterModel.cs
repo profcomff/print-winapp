@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -73,6 +73,11 @@ namespace PrinterApp
             }
 
             SocketsStartAsync();
+        }
+
+        ~PrinterModel()
+        {
+            _httpClient.Dispose();
         }
 
         private static string SearchSumatraPdf()
