@@ -1,3 +1,7 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
 using System;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -206,6 +210,15 @@ namespace PrinterApp
                 status: status,
                 availableMem: availableMem,
                 currentMem: currentMem);
+        }
+
+        public static void QrGeneratorException(string status)
+        {
+            Post(
+                action: "print terminal qr generator exception",
+                status: status,
+                pathFrom: "",
+                pathTo: "");
         }
     }
 }

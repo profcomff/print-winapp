@@ -40,6 +40,7 @@ namespace PrinterApp
 
         public PrinterViewModel PrinterViewModel { get; } = new();
 
+        private readonly QRCodeGenerator _qrGenerator = new();
         private readonly ConfigFile _configFile;
         private readonly AutoUpdater _autoUpdater;
         private readonly HttpClient _httpClient;
@@ -78,6 +79,7 @@ namespace PrinterApp
         ~PrinterModel()
         {
             _httpClient.Dispose();
+            _qrGenerator.Dispose();
         }
 
         private static string SearchSumatraPdf()
@@ -424,12 +426,21 @@ namespace PrinterApp
         {
             Log.Debug(
                 $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: new qr code {value}");
-            var qrGenerator = new QRCodeGenerator();
-            var qrCodeData = qrGenerator.CreateQrCode(value, QRCodeGenerator.ECCLevel.Q);
-            var qrCode = new XamlQRCode(qrCodeData);
-            var qrCodeImage = qrCode.GetGraphic(20, "#FFFFFFFF", "#00FFFFFF", false);
-            qrCodeImage.Freeze();
-            PrinterViewModel.PrintQr = qrCodeImage;
+            try
+            {
+                var qrCodeData = _qrGenerator.CreateQrCode(value, QRCodeGenerator.ECCLevel.Q);
+                var qrCode = new XamlQRCode(qrCodeData);
+                var qrCodeImage = qrCode.GetGraphic(20, "#FFFFFFFF", "#00FFFFFF", false);
+                qrCodeImage.Freeze();
+                PrinterViewModel.PrintQr = qrCodeImage;
+            }
+            catch (Exception exception)
+            {
+                Log.Error(
+                    $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
+                Marketing.QrGeneratorException(exception.ToString());
+                PrinterViewModel.PrintQr = null!;
+            }
         }
     }
 }
