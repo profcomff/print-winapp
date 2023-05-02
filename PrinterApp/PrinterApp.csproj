@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -9,11 +9,11 @@
     <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
     <ApplicationIcon>main.ico</ApplicationIcon>
     <Title>PrinterApp</Title>
-    <Description>gui fo work https://app.profcomff.com/print/docs</Description>
+    <Description>gui for work https://app.profcomff.com/print/docs</Description>
     <Authors>Dyakov EI</Authors>
     <Version>2.1.8.0</Version>
     <Company>dyakov.space</Company>
-    <Copyright>dyakov.space @ 2022</Copyright>
+    <Copyright>dyakov.space @ 2023</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

@@ -12,7 +12,11 @@ public class MemoryMonitor
     private readonly DispatcherTimer _dispatcherTimer;
     private PerformanceCounter _systemAvailableMemoryCounter = null!;
     private PerformanceCounter _currentProcessUsingMemoryCounter = null!;
+
+    //the interval is once an hour
     private const int LastWarningSendDelaySec = 60 * 60;
+
+    //the interval is once an hour
     private const int LastStatusSendDelaySec = 60 * 60;
     private int _lastWarningSendSec;
     private int _lastStatusSendSec;
@@ -21,6 +25,7 @@ public class MemoryMonitor
     {
         _dispatcherTimer = new DispatcherTimer
         {
+            //interval of times per second
             Interval = new TimeSpan(0, 0, 0, 1, 0)
         };
         _dispatcherTimer.Tick += MemoryMonitorTick;

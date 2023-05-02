@@ -79,7 +79,7 @@ public class PrinterModel
     ~PrinterModel()
     {
         _httpClient.Dispose();
-        _qrGenerator.Dispose();
+        _qrGenerator?.Dispose();
     }
 
     private static string SearchSumatraPdf()
