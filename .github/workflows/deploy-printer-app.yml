@@ -3,7 +3,7 @@ name: "Deploy PrinterApp x86"
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 env:
   PROJECT_PATH: PrinterApp/PrinterApp.csproj
@@ -27,21 +27,13 @@ jobs:
       - name: Archive Release
         uses: thedoctor0/zip-release@main
         with:
-          type: 'zip'
-          directory: 'PrinterApp/bin/Release/net7.0-windows/win-x86/publish/'
-          filename: 'PrinterApp_x86.zip'
-          exclusions: '*.pdb'
+          type: "zip"
+          directory: "PrinterApp/bin/Release/net7.0-windows/win-x86/publish/"
+          filename: "PrinterApp_x86.zip"
+          exclusions: "*.pdb"
 
-      - uses: actions/create-release@v1
-        id: create_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: GH Release
+        uses: softprops/action-gh-release@v0.1.15
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-
-      - uses: csexton/release-asset-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          file: 'PrinterApp/bin/Release/net7.0-windows/win-x86/publish/PrinterApp_x86.zip'
-          release-url: ${{ steps.create_release.outputs.upload_url }}
+          files: "PrinterApp/bin/Release/net7.0-windows/win-x86/publish/PrinterApp_x86.zip"
