@@ -114,13 +114,13 @@ public class PrinterModel
         }
 
         PrinterViewModel.DownloadNotInProgress = false;
+        PrinterViewModel.PrintQrVisibility = Visibility.Collapsed;
         if (PrinterViewModel.CodeTextBoxText.ToUpper() == "IDDQD")
         {
             var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar +
                                "iddqd.pdf";
             saveFilePath =
                 saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
-            PrinterViewModel.PrintQrVisibility = Visibility.Collapsed;
             ShowComplement();
             await using var s =
                 await _httpClient.GetStreamAsync(
@@ -133,14 +133,13 @@ public class PrinterModel
             PrinterViewModel.DownloadNotInProgress = true;
             Log.Information(
                 $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Easter");
-
+            PrintAsyncCompleteEvent?.Invoke();
             return;
         }
 
         Log.Debug(
             $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: Start response code {PrinterViewModel.CodeTextBoxText}");
         var patchFrom = $"{FileUrl}/{PrinterViewModel.CodeTextBoxText}";
-        PrinterViewModel.DownloadNotInProgress = false;
         try
         {
             var response =
@@ -198,7 +197,6 @@ public class PrinterModel
             PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
             PrinterViewModel.ErrorTextBlockText = HttpError;
         }
-
         PrinterViewModel.DownloadNotInProgress = true;
         Log.Debug(
             $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: End response code {PrinterViewModel.CodeTextBoxText}");
@@ -219,7 +217,6 @@ public class PrinterModel
         var name = Guid.NewGuid() + ".pdf";
         var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar + name;
         saveFilePath = saveFilePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
-        PrinterViewModel.PrintQrVisibility = Visibility.Collapsed;
         ShowComplement();
         await using var s =
             await _httpClient.GetStreamAsync($"{StaticUrl}/{fileWithOptions.Filename}");
@@ -296,7 +293,8 @@ public class PrinterModel
             PrinterViewModel.Compliment = Compliments.GetRandomCompliment();
             await Task.Delay(5000);
             PrinterViewModel.Compliment = "";
-            PrinterViewModel.PrintQrVisibility = Visibility.Visible;
+            if(PrinterViewModel.DownloadNotInProgress)
+                PrinterViewModel.PrintQrVisibility = Visibility.Visible;
         }).Start();
     }
 
@@ -382,9 +380,10 @@ public class PrinterModel
         }
 
         PrinterViewModel.PrintQr = null!;
-        PrinterViewModel.DownloadNotInProgress = false;
         if (websocketReceiveOptions.Files != null!)
         {
+            PrinterViewModel.DownloadNotInProgress = false;
+            PrinterViewModel.PrintQrVisibility = Visibility.Collapsed;
             DeleteOldFiles();
             foreach (var fileWithOptions in websocketReceiveOptions.Files)
             {
@@ -416,9 +415,10 @@ public class PrinterModel
                     PrinterViewModel.ErrorTextBlockText = HttpError;
                 }
             }
+
+            PrinterViewModel.DownloadNotInProgress = true;
         }
 
-        PrinterViewModel.DownloadNotInProgress = true;
         GenerateQr(websocketReceiveOptions.QrToken);
     }
 
