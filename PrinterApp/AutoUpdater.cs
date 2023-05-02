@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -14,16 +14,16 @@ namespace PrinterApp;
 public class AutoUpdater
 {
     private readonly DispatcherTimer _dispatcherTimer;
-
-    private readonly HttpClient _httpClient = new()
-    {
-        BaseAddress = new Uri("https://github.com/profcomff/print-winapp/releases/latest/"),
-    };
-
+    private readonly HttpClient _httpClient;
     private readonly Regex _regex = new(@"v\d+\..+");
 
     public AutoUpdater()
     {
+        _httpClient = new HttpClient
+        {
+            BaseAddress = new Uri("https://github.com/profcomff/print-winapp/releases/latest/"),
+        };
+
         _dispatcherTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromHours(1)
@@ -33,6 +33,11 @@ public class AutoUpdater
         DeleteOlderExe();
         DeleteOlderZip();
         CreateUpdateBat();
+    }
+
+    ~AutoUpdater()
+    {
+        _httpClient.Dispose();
     }
 
     public void StartTimer()

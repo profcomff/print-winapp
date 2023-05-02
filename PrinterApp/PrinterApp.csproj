@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -9,11 +9,11 @@
     <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
     <ApplicationIcon>main.ico</ApplicationIcon>
     <Title>PrinterApp</Title>
-    <Description>gui fo work https://app.profcomff.com/print/docs</Description>
+    <Description>gui for work https://app.profcomff.com/print/docs</Description>
     <Authors>Dyakov EI</Authors>
-    <Version>2.1.7.0</Version>
+    <Version>2.1.8.0</Version>
     <Company>dyakov.space</Company>
-    <Copyright>dyakov.space @ 2022</Copyright>
+    <Copyright>dyakov.space @ 2023</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +25,7 @@
     <None Remove="Images\snowflake1.png" />
     <None Remove="Images\snowflake2.png" />
     <None Remove="Images\snowflake3.png" />
+    <None Remove="Images\splash.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +51,10 @@
     <Resource Include="Images\snowflake1.png" />
     <Resource Include="Images\snowflake2.png" />
     <Resource Include="Images\snowflake3.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SplashScreen Include="Images\splash.jpg" />
   </ItemGroup>
 
 </Project>

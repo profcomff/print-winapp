@@ -1,131 +1,130 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace PrinterApp
+namespace PrinterApp;
+
+public class PrinterViewModel : NotifyPropertyChangeBase
 {
-    public class PrinterViewModel : NotifyPropertyChangeBase
+    private bool _downloadNotInProgress = true;
+    private string _codeTextBoxText = "";
+    private string _errorTextBlockText = "";
+    private Visibility _errorTextBlockVisibility = Visibility.Collapsed;
+    private ImageSource _printQr = new BitmapImage();
+    private Visibility _printQrVisibility = Visibility.Visible;
+    private string _compliment = "";
+    private Visibility _flakesVisibility = Visibility.Collapsed;
+    private ObservableCollection<double> _flakesCanvasTop = new();
+    private ObservableCollection<double> _flakesCanvasLeft = new();
+
+    public bool DownloadNotInProgress
     {
-        private bool _downloadNotInProgress = true;
-        private string _codeTextBoxText = "";
-        private string _errorTextBlockText = "";
-        private Visibility _errorTextBlockVisibility = Visibility.Collapsed;
-        private ImageSource _printQr = new BitmapImage();
-        private Visibility _printQrVisibility = Visibility.Visible;
-        private string _compliment = "";
-        private Visibility _flakesVisibility = Visibility.Collapsed;
-        private ObservableCollection<double> _flakesCanvasTop = new();
-        private ObservableCollection<double> _flakesCanvasLeft = new();
-
-        public bool DownloadNotInProgress
+        get => _downloadNotInProgress;
+        set
         {
-            get => _downloadNotInProgress;
-            set
-            {
-                if (value == _downloadNotInProgress) return;
-                _downloadNotInProgress = value;
-                OnPropertyChanged();
-            }
+            if (value == _downloadNotInProgress) return;
+            _downloadNotInProgress = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string CodeTextBoxText
+    public string CodeTextBoxText
+    {
+        get => _codeTextBoxText;
+        set
         {
-            get => _codeTextBoxText;
-            set
-            {
-                if (value == _codeTextBoxText) return;
-                _codeTextBoxText = value.ToUpper();
-                OnPropertyChanged();
-            }
+            if (value == _codeTextBoxText) return;
+            _codeTextBoxText = value.ToUpper();
+            OnPropertyChanged();
         }
+    }
 
-        public string ErrorTextBlockText
+    public string ErrorTextBlockText
+    {
+        get => _errorTextBlockText;
+        set
         {
-            get => _errorTextBlockText;
-            set
-            {
-                if (value == _errorTextBlockText) return;
-                _errorTextBlockText = value;
-                OnPropertyChanged();
-            }
+            if (value == _errorTextBlockText) return;
+            _errorTextBlockText = value;
+            OnPropertyChanged();
         }
+    }
 
-        public Visibility ErrorTextBlockVisibility
+    public Visibility ErrorTextBlockVisibility
+    {
+        get => _errorTextBlockVisibility;
+        set
         {
-            get => _errorTextBlockVisibility;
-            set
-            {
-                if (value == _errorTextBlockVisibility) return;
-                _errorTextBlockVisibility = value;
-                OnPropertyChanged();
-            }
+            if (value == _errorTextBlockVisibility) return;
+            _errorTextBlockVisibility = value;
+            OnPropertyChanged();
         }
+    }
 
-        public ImageSource PrintQr
+    public ImageSource PrintQr
+    {
+        get => _printQr;
+        set
         {
-            get => _printQr;
-            set
-            {
-                if (Equals(value, _printQr)) return;
-                _printQr = value;
-                OnPropertyChanged();
-            }
+            if (Equals(value, _printQr)) return;
+            _printQr = value;
+            OnPropertyChanged();
         }
+    }
 
-        public Visibility PrintQrVisibility
+    public Visibility PrintQrVisibility
+    {
+        get => _printQrVisibility;
+        set
         {
-            get => _printQrVisibility;
-            set
-            {
-                if (value == _printQrVisibility) return;
-                _printQrVisibility = value;
-                OnPropertyChanged();
-            }
+            if (value == _printQrVisibility) return;
+            _printQrVisibility = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string Compliment
+    public string Compliment
+    {
+        get => _compliment;
+        set
         {
-            get => _compliment;
-            set
-            {
-                if (value == _compliment) return;
-                _compliment = value;
-                OnPropertyChanged();
-            }
+            if (value == _compliment) return;
+            _compliment = value;
+            OnPropertyChanged();
         }
+    }
 
-        public Visibility FlakesVisibility
+    public Visibility FlakesVisibility
+    {
+        get => _flakesVisibility;
+        set
         {
-            get => _flakesVisibility;
-            set
-            {
-                if (value == _flakesVisibility) return;
-                _flakesVisibility = value;
-                OnPropertyChanged();
-            }
+            if (value == _flakesVisibility) return;
+            _flakesVisibility = value;
+            OnPropertyChanged();
         }
+    }
 
-        public ObservableCollection<double> FlakesCanvasTop
+    public ObservableCollection<double> FlakesCanvasTop
+    {
+        get => _flakesCanvasTop;
+        set
         {
-            get => _flakesCanvasTop;
-            set
-            {
-                if (Equals(value, _flakesCanvasTop)) return;
-                _flakesCanvasTop = value;
-                OnPropertyChanged();
-            }
+            if (Equals(value, _flakesCanvasTop)) return;
+            _flakesCanvasTop = value;
+            OnPropertyChanged();
         }
+    }
 
-        public ObservableCollection<double> FlakesCanvasLeft
+    public ObservableCollection<double> FlakesCanvasLeft
+    {
+        get => _flakesCanvasLeft;
+        set
         {
-            get => _flakesCanvasLeft;
-            set
-            {
-                if (Equals(value, _flakesCanvasLeft)) return;
-                _flakesCanvasLeft = value;
-                OnPropertyChanged();
-            }
+            if (Equals(value, _flakesCanvasLeft)) return;
+            _flakesCanvasLeft = value;
+            OnPropertyChanged();
         }
     }
 }
