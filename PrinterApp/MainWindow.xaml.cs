@@ -209,8 +209,8 @@ namespace PrinterApp
                 source.AddHook(WndProc);
             }
             else {
-                MessageBox.Show("ОШИБКА: не удалось получить хэндл окна");
-                Environment.Exit(1);
+                Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: не удалось получить хэндл окна");
+                Marketing.HwndSourceError();
             }
         }
         
