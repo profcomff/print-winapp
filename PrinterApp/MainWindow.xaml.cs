@@ -208,8 +208,10 @@ public partial class MainWindow : Window
         {
             source.AddHook(WndProc);
         }
-        else {
-            Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: не удалось получить хэндл окна");
+        else
+        {
+            Log.Error(
+                $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: не удалось получить отслеживание окна");
             Marketing.HwndSourceError();
         }
     }

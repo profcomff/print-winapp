@@ -27,7 +27,8 @@ public class MouseOperations
     private static extern bool GetCursorPos(out MousePoint lpMousePoint);
 
     [DllImport("user32.dll")]
-    private static extern void mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
+    private static extern void
+        mouse_event(int dwFlags, int dx, int dy, int dwData, int dwExtraInfo);
 
     public static void SetCursorPosition(int x, int y)
     {
@@ -43,7 +44,11 @@ public class MouseOperations
     {
         MousePoint currentMousePoint;
         var gotPoint = GetCursorPos(out currentMousePoint);
-        if (!gotPoint) { currentMousePoint = new MousePoint(0, 0); }
+        if (!gotPoint)
+        {
+            currentMousePoint = new MousePoint(0, 0);
+        }
+
         return currentMousePoint;
     }
 
@@ -53,10 +58,10 @@ public class MouseOperations
 
         mouse_event
             ((int)value,
-             position.X,
-             position.Y,
-             0,
-             0)
+                position.X,
+                position.Y,
+                0,
+                0)
             ;
     }
 

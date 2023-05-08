@@ -13,20 +13,23 @@ public static class Marketing
         BaseAddress = new Uri("https://api.test.profcomff.com/marketing/v1/"),
     };
 #else
-        private static readonly HttpClient SharedClient = new HttpClient
-        {
-            BaseAddress = new Uri("https://api.profcomff.com/marketing/v1/"),
-        };
+    private static readonly HttpClient SharedClient = new HttpClient
+    {
+        BaseAddress = new Uri("https://api.profcomff.com/marketing/v1/"),
+    };
 #endif
+
     private static readonly string AssemblyVersion =
         Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty;
+
+    public static string TerminalUserId = "";
 
     private static void Post(string action, string status, string pathFrom,
         string pathTo)
     {
         var body = new MarketingBody(action: action,
             additional_data:
-            $"{{\"status\": \"{status}\",\"app_version\": \"{AssemblyVersion}\"}}",
+            $"{{\"status\": \"{status}\",\"app_version\": \"{AssemblyVersion}\",\"terminal_user_id\": \"{TerminalUserId}\"}}",
             path_from: pathFrom, path_to: pathTo);
         SharedClient.PostAsJsonAsync("action", body);
     }
@@ -35,7 +38,7 @@ public static class Marketing
     {
         var body = new MarketingBody(action: action,
             additional_data:
-            $"{{\"status\": \"{status}\",\"app_version\": \"{AssemblyVersion}\"}}");
+            $"{{\"status\": \"{status}\",\"app_version\": \"{AssemblyVersion}\",\"terminal_user_id\": \"{TerminalUserId}\"}}");
         SharedClient.PostAsJsonAsync("action", body);
     }
 
@@ -44,7 +47,7 @@ public static class Marketing
     {
         var body = new MarketingBody(action: action,
             additional_data:
-            $"{{\"status\": \"{status}\",\"available_mem\": \"{availableMem}\",\"current_mem\": \"{currentMem}\",\"app_version\": \"{AssemblyVersion}\"}}");
+            $"{{\"status\": \"{status}\",\"available_mem\": \"{availableMem}\",\"current_mem\": \"{currentMem}\",\"app_version\": \"{AssemblyVersion}\",\"terminal_user_id\": \"{TerminalUserId}\"}}");
         SharedClient.PostAsJsonAsync("action", body);
     }
 
@@ -203,7 +206,7 @@ public static class Marketing
             action: "print terminal qr generator exception",
             status: status);
     }
-    
+
     public static void HwndSourceError()
     {
         Post(
