@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PrintApp {
+namespace PrinterApp {
     public class MouseOperations
     {
         [Flags]
