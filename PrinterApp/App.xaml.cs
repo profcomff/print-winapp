@@ -53,6 +53,7 @@ public partial class App : Application
     private void RebootHandler()
     {
         _printerModel.PrinterViewModel.DownloadNotInProgress = false;
+        _printerModel.PrinterViewModel.PrintQrVisibility = Visibility.Collapsed;
         _printerModel.PrinterViewModel.CodeTextBoxText = "REBOOT";
         _mainWindow.Close();
     }
@@ -122,13 +123,13 @@ public partial class App : Application
                 rollingInterval: RollingInterval.Day)
             .CreateLogger();
 #else
-            var log = new LoggerConfiguration()
-                .MinimumLevel.Information()
-                .WriteTo.Console()
-                .WriteTo.File(
-                    $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}{Path.DirectorySeparatorChar}.printerAppLogs/{fileName}.txt",
-                    rollingInterval: RollingInterval.Day)
-                .CreateLogger();
+        var log = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .WriteTo.Console()
+            .WriteTo.File(
+                $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}{Path.DirectorySeparatorChar}.printerAppLogs/{fileName}.txt",
+                rollingInterval: RollingInterval.Day)
+            .CreateLogger();
 #endif
         Log.Logger = log;
     }

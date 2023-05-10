@@ -10,7 +10,7 @@ public class ConfigFile
 {
     public string ExitCode { get; set; } = "dyakov";
     public string TempSavePath { get; set; } = Path.GetTempPath() + ".printerApp";
-    public bool StartWithWindows { get; set; } = false;
+    public bool StartWithWindows { get; set; }
     public bool AutoUpdate { get; set; } = true;
     public string AuthorizationToken { get; set; } = "token";
 

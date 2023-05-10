@@ -14,19 +14,22 @@ using System.Threading.Tasks;
 using System.Windows;
 using QRCoder;
 using QRCoder.Xaml;
+using System.Collections.Generic;
 
 namespace PrinterApp;
 
 public class PrinterModel
 {
 #if DEBUG
+    private const string ApiUrl = "https://api.test.profcomff.com";
     private const string FileUrl = "https://api.test.profcomff.com/print/file";
     private const string StaticUrl = "https://api.test.profcomff.com/print/static";
     private const string WebSockUrl = "wss://api.test.profcomff.com/print/qr";
 #else
-        private const string FileUrl = "https://api.profcomff.com/print/file";
-        private const string StaticUrl = "https://api.profcomff.com/print/static";
-        private const string WebSockUrl = "wss://api.profcomff.com/print/qr";
+    private const string ApiUrl = "https://api.profcomff.com";
+    private const string FileUrl = "https://api.profcomff.com/print/file";
+    private const string StaticUrl = "https://api.profcomff.com/print/static";
+    private const string WebSockUrl = "wss://api.profcomff.com/print/qr";
 #endif
     private const string CodeError = "Некорректный код";
     private const string HttpError = "Ошибка сети";
@@ -65,7 +68,28 @@ public class PrinterModel
 
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Authorization
-            = new AuthenticationHeaderValue("token", _configFile.AuthorizationToken);
+            = new AuthenticationHeaderValue(_configFile.AuthorizationToken);
+
+        try
+        {
+            var response = _httpClient.GetAsync($"{ApiUrl}/auth/me");
+            response.Wait(5000);
+            response.Result.EnsureSuccessStatusCode();
+            var responseBody = response.Result.Content.ReadAsStringAsync();
+            responseBody.Wait(1000);
+            var responceString = responseBody.Result;
+            var htmlAttributes =
+                JsonConvert.DeserializeObject<Dictionary<string, string>>(responceString) ??
+                throw new InvalidOperationException();
+            Log.Information(htmlAttributes["id"]);
+            Marketing.TerminalUserId = htmlAttributes["id"];
+        }
+        catch (Exception e)
+        {
+            Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {e}");
+            throw;
+        }
+
 
         if (SearchSumatraPdf() == "")
         {
@@ -197,6 +221,7 @@ public class PrinterModel
             PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
             PrinterViewModel.ErrorTextBlockText = HttpError;
         }
+
         PrinterViewModel.DownloadNotInProgress = true;
         Log.Debug(
             $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: End response code {PrinterViewModel.CodeTextBoxText}");
@@ -293,7 +318,7 @@ public class PrinterModel
             PrinterViewModel.Compliment = Compliments.GetRandomCompliment();
             await Task.Delay(5000);
             PrinterViewModel.Compliment = "";
-            if(PrinterViewModel.DownloadNotInProgress)
+            if (PrinterViewModel.DownloadNotInProgress)
                 PrinterViewModel.PrintQrVisibility = Visibility.Visible;
         }).Start();
     }
