@@ -213,4 +213,11 @@ public static class Marketing
             action: "print terminal failed to get window HwndSource",
             status: "error");
     }
+
+    public static void TerminalUserIdError()
+    {
+        Post(
+            action: "print terminal failed to get user id",
+            status: "error");
+    }
 }
