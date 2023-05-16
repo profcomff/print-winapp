@@ -28,8 +28,8 @@ public static class Marketing
         string pathTo)
     {
         var body = new MarketingBody(action: action,
-            additional_data:
-            $"{{\"status\": \"{status}\",\"app_version\": \"{AssemblyVersion}\",\"terminal_user_id\": \"{TerminalUserId}\"}}",
+            additional_data: new MarketingBody.AdditionalData(status, AssemblyVersion,
+                TerminalUserId),
             path_from: pathFrom, path_to: pathTo);
         SharedClient.PostAsJsonAsync("action", body);
     }
@@ -37,8 +37,8 @@ public static class Marketing
     private static void Post(string action, string status)
     {
         var body = new MarketingBody(action: action,
-            additional_data:
-            $"{{\"status\": \"{status}\",\"app_version\": \"{AssemblyVersion}\",\"terminal_user_id\": \"{TerminalUserId}\"}}");
+            additional_data: new MarketingBody.AdditionalData(status, AssemblyVersion,
+                TerminalUserId));
         SharedClient.PostAsJsonAsync("action", body);
     }
 
@@ -46,8 +46,8 @@ public static class Marketing
         float currentMem)
     {
         var body = new MarketingBody(action: action,
-            additional_data:
-            $"{{\"status\": \"{status}\",\"available_mem\": \"{availableMem}\",\"current_mem\": \"{currentMem}\",\"app_version\": \"{AssemblyVersion}\",\"terminal_user_id\": \"{TerminalUserId}\"}}");
+            additional_data: new MarketingBody.AdditionalData(status, availableMem, currentMem,
+                AssemblyVersion, TerminalUserId));
         SharedClient.PostAsJsonAsync("action", body);
     }
 
