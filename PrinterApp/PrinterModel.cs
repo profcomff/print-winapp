@@ -15,6 +15,7 @@ using System.Windows;
 using QRCoder;
 using QRCoder.Xaml;
 using System.Collections.Generic;
+using System.Windows.Documents;
 
 namespace PrinterApp;
 
@@ -87,6 +88,10 @@ public class PrinterModel
         catch (Exception e)
         {
             Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {e}");
+            Marketing.TerminalUserIdError();
+            MessageBox.Show(
+                "Терминал не смог получить id. Сообщите ответственному лицу. Перезапустите программу.",
+                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             throw;
         }
 
