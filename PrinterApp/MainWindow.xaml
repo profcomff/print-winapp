@@ -41,10 +41,10 @@
                 <Rectangle Style="{DynamicResource Flake3}" Canvas.Left="{Binding FlakesCanvasLeft[11]}"
                            Canvas.Top="{Binding FlakesCanvasTop[11]}" />
             </Canvas>
-            <Image Width="212" Height="212" Source="{Binding PrintQr}" HorizontalAlignment="Left"
+            <Path Width="212" Height="212" Data="{Binding PrintQr}" HorizontalAlignment="Left"
                    VerticalAlignment="Top" Canvas.Left="219" Canvas.Top="485"
                    Visibility="{Binding PrintQrVisibility}" Focusable="False" Stretch="Fill"
-                   RenderOptions.EdgeMode="Aliased" />
+                   RenderOptions.EdgeMode="Aliased" Fill="White" />
             <Rectangle Width="3" Height="590" Canvas.Left="684" Canvas.Top="155"
                        Fill="{DynamicResource Labels.Foreground}" Focusable="False" />
             <TextBlock FontSize="24" Width="641" Height="449" Canvas.Left="814" Canvas.Top="57" TextWrapping="Wrap"

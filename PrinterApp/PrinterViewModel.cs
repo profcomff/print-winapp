@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace PrinterApp;
 
@@ -11,7 +10,7 @@ public class PrinterViewModel : NotifyPropertyChangeBase
     private string _codeTextBoxText = "";
     private string _errorTextBlockText = "";
     private Visibility _errorTextBlockVisibility = Visibility.Collapsed;
-    private ImageSource _printQr = new BitmapImage();
+    private Geometry _printQr = Geometry.Empty;
     private Visibility _printQrVisibility = Visibility.Visible;
     private string _compliment = "";
     private Visibility _flakesVisibility = Visibility.Collapsed;
@@ -62,7 +61,7 @@ public class PrinterViewModel : NotifyPropertyChangeBase
         }
     }
 
-    public ImageSource PrintQr
+    public Geometry PrintQr
     {
         get => _printQr;
         set

@@ -12,10 +12,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using QRCoder;
-using QRCoder.Xaml;
 using System.Collections.Generic;
-using System.Windows.Documents;
+using ZXing;
+using ZXing.Windows.Compatibility;
 
 namespace PrinterApp;
 
@@ -44,7 +43,6 @@ public class PrinterModel
 
     public PrinterViewModel PrinterViewModel { get; } = new();
 
-    private readonly QRCodeGenerator _qrGenerator = new();
     private readonly ConfigFile _configFile;
     private readonly AutoUpdater _autoUpdater;
     private readonly HttpClient _httpClient;
@@ -108,7 +106,6 @@ public class PrinterModel
     ~PrinterModel()
     {
         _httpClient.Dispose();
-        _qrGenerator?.Dispose();
     }
 
     private static string SearchSumatraPdf()
@@ -458,11 +455,18 @@ public class PrinterModel
             $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: new qr code {value}");
         try
         {
-            var qrCodeData = _qrGenerator.CreateQrCode(value, QRCodeGenerator.ECCLevel.Q);
-            var qrCode = new XamlQRCode(qrCodeData);
-            var qrCodeImage = qrCode.GetGraphic(20, "#FFFFFFFF", "#00FFFFFF", false);
-            qrCodeImage.Freeze();
-            PrinterViewModel.PrintQr = qrCodeImage;
+            var writer = new BarcodeWriterGeometry
+            {
+                Format = BarcodeFormat.QR_CODE,
+                Options = new ZXing.Common.EncodingOptions
+                {
+                    Height = 212,
+                    Width = 212
+                }
+            };
+            var image = writer.Write(value);
+            image.Freeze();
+            PrinterViewModel.PrintQr = image;
         }
         catch (Exception exception)
         {
