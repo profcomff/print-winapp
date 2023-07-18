@@ -90,14 +90,14 @@ public class PrinterModel
             MessageBox.Show(
                 "Терминал не смог получить id. Сообщите ответственному лицу. Перезапустите программу.",
                 "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            throw;
+            Close();
         }
 
 
         if (SearchSumatraPdf() == "")
         {
             MessageBox.Show(SumatraError);
-            throw new Exception();
+            Close();
         }
 
         SocketsStartAsync();
@@ -106,6 +106,12 @@ public class PrinterModel
     ~PrinterModel()
     {
         _httpClient.Dispose();
+    }
+
+    private static void Close()
+    {
+        Log.CloseAndFlush();
+        Environment.Exit(0);
     }
 
     private static string SearchSumatraPdf()
@@ -449,22 +455,23 @@ public class PrinterModel
         GenerateQr(websocketReceiveOptions.QrToken);
     }
 
+    private readonly BarcodeWriterGeometry _barcodeWriterGeometry = new()
+    {
+        Format = BarcodeFormat.QR_CODE,
+        Options = new ZXing.Common.EncodingOptions
+        {
+            Height = 212,
+            Width = 212
+        }
+    };
+
     private void GenerateQr(string value)
     {
         Log.Debug(
             $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: new qr code {value}");
         try
         {
-            var writer = new BarcodeWriterGeometry
-            {
-                Format = BarcodeFormat.QR_CODE,
-                Options = new ZXing.Common.EncodingOptions
-                {
-                    Height = 212,
-                    Width = 212
-                }
-            };
-            var image = writer.Write(value);
+            var image = _barcodeWriterGeometry.Write(value);
             image.Freeze();
             PrinterViewModel.PrintQr = image;
         }
