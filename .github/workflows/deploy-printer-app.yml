@@ -12,7 +12,7 @@ jobs:
   build_release:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
         with:
           lfs: true
 
