@@ -51,8 +51,8 @@
 
 ## Руководство по внесению изменений
 
-Программа написана под Windows на .NET 7 с использованием технологии [Windows Presentation Foundation](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/?view=netdesktop-6.0).  
-Минимально для сборки проекта понадобится установленный [Microsoft .NET 7 SDK](https://dotnet.microsoft.com/en-us/download). Для графического редактирования интерфейсов рекомендуется использовать microsoft Visual Studio Blend 2022.  
+Программа написана под Windows на .NET 8 с использованием технологии [Windows Presentation Foundation](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/?view=netdesktop-8.0).  
+Минимально для сборки проекта понадобится установленный [Microsoft .NET 8 SDK](https://dotnet.microsoft.com/en-us/download). Для графического редактирования интерфейсов рекомендуется использовать microsoft Visual Studio Blend 2022.  
 [Продолжение в CONTRIBUTING.md](CONTRIBUTING.md)
 
 ![doom-bigfont-good-luck-newbie](https://user-images.githubusercontent.com/13213573/200591035-6a69a06e-21dd-4145-a492-4c78a36e750b.png)
