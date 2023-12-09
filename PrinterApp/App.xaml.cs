@@ -23,6 +23,8 @@ public partial class App : Application
 
     private App()
     {
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+
         Thread.CurrentThread.CurrentCulture =
             System.Globalization.CultureInfo.CreateSpecificCulture("en-US");
         _memoryMonitor.StartTimer();
@@ -48,6 +50,12 @@ public partial class App : Application
         _mainWindow.Closed += MainWindowClosed;
 
         Marketing.LoadProgram();
+    }
+
+    private void CurrentDomainOnUnhandledException(object sender,
+        UnhandledExceptionEventArgs e)
+    {
+        Log.Error((Exception)e.ExceptionObject, "CurrentDomainOnUnhandledException");
     }
 
     private void RebootHandler()
