@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -12,7 +13,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Collections.Generic;
 using ZXing;
 using ZXing.Windows.Compatibility;
 
@@ -394,6 +394,12 @@ public class PrinterModel
         {
             Marketing.SocketException("websocketReceiveOptions is null");
             return;
+        }
+
+        if (websocketReceiveOptions.Error != null && websocketReceiveOptions.Error != "")
+        {
+            Marketing.SocketException(websocketReceiveOptions.Error);
+            Close();
         }
 
         if (websocketReceiveOptions.ManualUpdate)
