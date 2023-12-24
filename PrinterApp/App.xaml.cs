@@ -1,6 +1,6 @@
+using Serilog;
 using System;
 using System.IO;
-using Serilog;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
