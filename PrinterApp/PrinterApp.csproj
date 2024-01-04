@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <Platforms>x86</Platforms>
@@ -11,7 +11,7 @@
     <Title>PrinterApp</Title>
     <Description>gui for work https://app.profcomff.com/print/docs</Description>
     <Authors>Dyakov EI</Authors>
-    <Version>2.1.12.1</Version>
+    <Version>2.1.12.2</Version>
     <Company>dyakov.space</Company>
     <Copyright>dyakov.space @ 2023</Copyright>
   </PropertyGroup>
@@ -33,9 +33,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Emgu.CV.Bitmap" Version="4.8.1.5350" />
+    <PackageReference Include="Emgu.CV.runtime.windows" Version="4.8.1.5350" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Serilog" Version="3.1.1" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="ZXing.Net" Version="0.16.9" />
