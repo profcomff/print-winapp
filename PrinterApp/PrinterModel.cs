@@ -1,8 +1,10 @@
+using Emgu.CV;
 using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -101,6 +103,8 @@ public class PrinterModel
         }
 
         SocketsStartAsync();
+
+        AsyncSaveScreen("LoadTerminal");
     }
 
     ~PrinterModel()
@@ -136,6 +140,36 @@ public class PrinterModel
         return File.Exists(path) ? path : "";
     }
 
+    private static void AsyncSaveScreen(string imageName = "")
+    {
+        new Task(() => { SaveScreen(imageName); }).Start();
+    }
+
+    private static void SaveScreen(string imageName = "")
+    {
+        try
+        {
+            using var capture = new VideoCapture();
+            var image = capture.QueryFrame();
+            if (image == null) return;
+            var bitmap = image.ToBitmap();
+            var directory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".printerAppLogs",
+                "img");
+            Directory.CreateDirectory(directory);
+            var path = Path.Combine(directory,
+                $"{imageName}{DateTime.Now:yyyy_MM_ddTHH_mm_ss}.jpeg");
+            bitmap.Save(path, ImageFormat.Jpeg);
+            bitmap.Dispose();
+            image.Dispose();
+        }
+        catch (Exception exception)
+        {
+            Log.Error(exception.Message);
+        }
+    }
+
     public async void PrintAsync(bool printDialog)
     {
         if (PrinterViewModel.CodeTextBoxText.Length < 1)
@@ -149,6 +183,7 @@ public class PrinterModel
         PrinterViewModel.PrintQrVisibility = Visibility.Collapsed;
         if (PrinterViewModel.CodeTextBoxText.ToUpper() == "IDDQD")
         {
+            AsyncSaveScreen("iddqd");
             var saveFilePath = _configFile.TempSavePath + Path.DirectorySeparatorChar +
                                "iddqd.pdf";
             saveFilePath =
@@ -215,6 +250,7 @@ public class PrinterModel
             else if (response.StatusCode is HttpStatusCode.NotFound
                      or HttpStatusCode.UnsupportedMediaType)
             {
+                AsyncSaveScreen("checkCodeFail");
                 Marketing.CheckCode(statusOk: false, pathFrom: patchFrom);
 
                 PrinterViewModel.ErrorTextBlockVisibility = Visibility.Visible;
@@ -238,7 +274,17 @@ public class PrinterModel
 
     public bool WrongExitCode()
     {
-        return PrinterViewModel.CodeTextBoxText != _configFile.ExitCode.ToUpper();
+        var answer = PrinterViewModel.CodeTextBoxText != _configFile.ExitCode.ToUpper();
+        if (answer)
+        {
+            AsyncSaveScreen($"WrongExitCode{answer}");
+        }
+        else
+        {
+            SaveScreen($"WrongExitCode{answer}");
+        }
+
+        return answer;
     }
 
     private async Task Download(FileWithOptions fileWithOptions, string patchFrom,

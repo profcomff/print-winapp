@@ -1,8 +1,5 @@
-using Emgu.CV;
 using Serilog;
 using System;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Timers;
@@ -107,14 +104,6 @@ public partial class MainWindow : Window
 #endif
         _printerModel.PrintAsyncCompleteEvent += () => { CodeBox.Focus(); };
         Marketing.MainWindowLoaded();
-        using (var capture = new VideoCapture()) //create a camera capture)
-        {
-            var image = capture.QueryFrame().ToBitmap(); //take a picture
-            var ms = new MemoryStream();
-            image.Save(ms, ImageFormat.Jpeg);
-            byte[] byteImage = ms.ToArray();
-            var SigBase64 = Convert.ToBase64String(byteImage); // Get Base64
-        }
     }
 
     private bool IsTextAllowed(string text)

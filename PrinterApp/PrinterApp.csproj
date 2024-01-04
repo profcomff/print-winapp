@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <Platforms>x86</Platforms>
@@ -11,7 +11,7 @@
     <Title>PrinterApp</Title>
     <Description>gui for work https://app.profcomff.com/print/docs</Description>
     <Authors>Dyakov EI</Authors>
-    <Version>2.1.12.1</Version>
+    <Version>2.1.12.2</Version>
     <Company>dyakov.space</Company>
     <Copyright>dyakov.space @ 2023</Copyright>
   </PropertyGroup>
