@@ -27,7 +27,6 @@ public partial class App : Application
 
         Thread.CurrentThread.CurrentCulture =
             System.Globalization.CultureInfo.CreateSpecificCulture("en-US");
-        _memoryMonitor.StartTimer();
 
         var fileName = GetType().Namespace!;
         ConfigureLogger(fileName);
@@ -44,6 +43,7 @@ public partial class App : Application
 
         _printerModel = new PrinterModel(_configFile, _autoUpdater);
         _printerModel.Reboot += RebootHandler;
+        _memoryMonitor.StartTimer();
         _mainWindow = new MainWindow(_printerModel);
         _mainWindow.Title = $"{_mainWindow.Title} {_assemblyVersion}";
         _mainWindow.Closing += MainWindowClosing;
