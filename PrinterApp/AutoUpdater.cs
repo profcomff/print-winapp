@@ -114,7 +114,7 @@ public class AutoUpdater
                         $"{GetType().Name} CheckNewVersion: Finish download");
 
                     Marketing.UpdateDownloaded();
-                    Process.Start(new ProcessStartInfo(BatFileName) { UseShellExecute = false });
+                    Process.Start(new ProcessStartInfo(BatFileName) { UseShellExecute = true });
                     await Log.CloseAndFlushAsync();
                     Environment.Exit(0);
                 }
