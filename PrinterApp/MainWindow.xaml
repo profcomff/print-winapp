@@ -59,22 +59,31 @@
                 <Run Text="3) Получи комбинацию цифр для печати документа. " /><LineBreak />
                 <Run Text="4) Введи комбинацию в окно ввода на компьютере бесплатного принтера" />
             </TextBlock>
-            <TextBlock Text="Приложение Твой ФФ!" FontSize="24" Width="256" Height="28" Canvas.Left="854"
+            <TextBlock Text="Приложение Твой ФФ!" FontSize="24" Width="256" Height="28" Canvas.Left="700"
                        Canvas.Top="540" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
                        FontWeight="Bold" Focusable="False" />
-            <TextBlock Text="Бот принтера ВК" FontSize="24" Width="189" Height="28" Canvas.Left="1208"
+            <TextBlock Text="Бот принтера ВК" FontSize="24" Width="189" Height="28" Canvas.Left="1045"
                        Canvas.Top="540"
                        TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold"
                        Focusable="False" />
-            <TextBlock Text="app.profcomff.com" FontSize="24" Width="209" Height="28" Canvas.Left="878"
+            <TextBlock Text="Регистрация на СТЛ" FontSize="24" Width="256" Height="28" Canvas.Left="1320"
+                       Canvas.Top="540"
+                       TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold"
+                       Focusable="False" />
+            <TextBlock Text="app.profcomff.com" FontSize="24" Width="209" Height="28" Canvas.Left="727"
                        Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
                        FontWeight="Bold" Focusable="False" />
-            <TextBlock Text="vk.me/profcomff_print_bot" FontSize="24" Width="290" Height="28" Canvas.Left="1158"
+            <TextBlock Text="vk.me/profcomff_print_bot" FontSize="24" Width="290" Height="28" Canvas.Left="995"
                        Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
                        FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Focusable="False" />
-            <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.AppProfcomffCom}" Canvas.Left="876"
+            <TextBlock Text="vk.com/studliderff" FontSize="24" Width="210" Height="28" Canvas.Left="1340"
+                       Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
+                       FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Focusable="False" />
+            <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.AppProfcomffCom}" Canvas.Left="722"
                        Canvas.Top="591" HorizontalAlignment="Center" VerticalAlignment="Top" Focusable="False" />
-            <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.ProfcomffPrint}" Canvas.Left="1197"
+            <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.ProfcomffPrint}" Canvas.Left="1034"
+                       Canvas.Top="591" HorizontalAlignment="Left" VerticalAlignment="Center" Focusable="False" />
+            <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.StlReg}" Canvas.Left="1335"
                        Canvas.Top="591" HorizontalAlignment="Left" VerticalAlignment="Center" Focusable="False" />
             <TextBlock Text="{Binding Compliment}" TextWrapping="Wrap"
                        Foreground="{DynamicResource Labels.Foreground}" FontFamily="Roboto" FontWeight="Bold"
