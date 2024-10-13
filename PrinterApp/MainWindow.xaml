@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="PrintApp" Height="900" Width="1600"
         FontFamily="/PrinterApp;component/Fonts/#Roboto"
+        FontFamily="/PrinterApp;component/Fonts/#Benzin"
         WindowState="Maximized"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -66,18 +67,21 @@
                        Canvas.Top="540"
                        TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold"
                        Focusable="False" />
-            <TextBlock Text="Регистрация на СТЛ" FontSize="24" Width="256" Height="28" Canvas.Left="1320"
-                       Canvas.Top="540"
-                       TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}" FontWeight="Bold"
-                       Focusable="False" />
+            <TextBlock FontSize="24" FontFamily="Benzin" FontWeight="Bold" Width="256" Height="56" Canvas.Left="1310"
+                       Canvas.Top="520" TextAlignment="Center" Foreground="#dcde8c"
+                       TextWrapping="Wrap"
+                       Focusable="False">
+                <Run Text="РЕГИСТРАЦИЯ НА" /><LineBreak />
+                <Run Text="СТУДЛИДЕР" /><LineBreak />
+            </TextBlock>
             <TextBlock Text="app.profcomff.com" FontSize="24" Width="209" Height="28" Canvas.Left="727"
                        Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
                        FontWeight="Bold" Focusable="False" />
             <TextBlock Text="vk.me/profcomff_print_bot" FontSize="24" Width="290" Height="28" Canvas.Left="995"
                        Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
                        FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Focusable="False" />
-            <TextBlock Text="vk.com/studliderff" FontSize="24" Width="210" Height="28" Canvas.Left="1340"
-                       Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
+            <TextBlock Text="vk.com/studliderff" FontFamily="Benzin" FontSize="24" Width="220" Height="28" Canvas.Left="1335"
+                       Canvas.Top="815" TextWrapping="Wrap" Foreground="#dcde8c"
                        FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Focusable="False" />
             <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.AppProfcomffCom}" Canvas.Left="722"
                        Canvas.Top="591" HorizontalAlignment="Center" VerticalAlignment="Top" Focusable="False" />

@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Fonts\Benzin-Bold.ttf" />
     <None Remove="Fonts\Roboto-Bold.ttf" />
     <None Remove="Fonts\Roboto-Regular.ttf" />
     <None Remove="Images\App.Background.png" />
@@ -46,6 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Fonts\Benzin-Bold.ttf" />
     <Resource Include="Fonts\Roboto-Bold.ttf" />
     <Resource Include="Fonts\Roboto-Regular.ttf" />
     <Resource Include="Images\App.Background.png" />
