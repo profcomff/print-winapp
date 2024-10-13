@@ -45,9 +45,9 @@
                    VerticalAlignment="Top" Canvas.Left="219" Canvas.Top="485"
                    Visibility="{Binding PrintQrVisibility}" Focusable="False" Stretch="Fill"
                    RenderOptions.EdgeMode="Aliased" Fill="White" />
-            <Rectangle Width="3" Height="590" Canvas.Left="684" Canvas.Top="155"
-                       Fill="{DynamicResource Labels.Foreground}" Focusable="False" />
-            <TextBlock FontSize="24" Width="641" Height="449" Canvas.Left="814" Canvas.Top="57" TextWrapping="Wrap"
+            <!-- <Rectangle Width="3" Height="590" Canvas.Left="684" Canvas.Top="155"
+                       Fill="{DynamicResource Labels.Foreground}" Focusable="False" /> -->
+            <TextBlock FontSize="30" Width="876" Height="449" Canvas.Left="700" Canvas.Top="57" TextWrapping="Wrap"
                        Foreground="{DynamicResource Labels.Foreground}" FontFamily="Roboto" FontWeight="Bold"
                        Focusable="False">
                 <Run
