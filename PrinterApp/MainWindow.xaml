@@ -59,7 +59,7 @@
                 <Run Text="3) Получи комбинацию цифр для печати документа. " /><LineBreak />
                 <Run Text="4) Введи комбинацию в окно ввода на компьютере бесплатного принтера" />
             </TextBlock>
-            <TextBlock Text="Приложение Твой ФФ!" FontSize="24" Width="256" Height="28" Canvas.Left="854"
+            <!-- <TextBlock Text="Приложение Твой ФФ!" FontSize="24" Width="256" Height="28" Canvas.Left="854"
                        Canvas.Top="540" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
                        FontWeight="Bold" Focusable="False" />
             <TextBlock Text="Бот принтера ВК" FontSize="24" Width="189" Height="28" Canvas.Left="1208"
@@ -71,7 +71,7 @@
                        FontWeight="Bold" Focusable="False" />
             <TextBlock Text="vk.me/profcomff_print_bot" FontSize="24" Width="290" Height="28" Canvas.Left="1158"
                        Canvas.Top="815" TextWrapping="Wrap" Foreground="{DynamicResource Labels.Foreground}"
-                       FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Focusable="False" />
+                       FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center" Focusable="False" /> -->
             <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.AppProfcomffCom}" Canvas.Left="876"
                        Canvas.Top="591" HorizontalAlignment="Center" VerticalAlignment="Top" Focusable="False" />
             <Rectangle Width="212" Height="212" Fill="{DynamicResource Qr.ProfcomffPrint}" Canvas.Left="1197"
