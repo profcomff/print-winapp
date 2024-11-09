@@ -47,7 +47,7 @@
                    RenderOptions.EdgeMode="Aliased" Fill="White" />
             <Rectangle Width="3" Height="590" Canvas.Left="684" Canvas.Top="155"
                        Fill="{DynamicResource Labels.Foreground}" Focusable="False" />
-            <TextBlock FontSize="24" Width="641" Height="449" Canvas.Left="814" Canvas.Top="57" TextWrapping="Wrap"
+            <TextBlock FontSize="24" Width="641" Height="449" Canvas.Left="814" Canvas.Top="310" TextWrapping="Wrap"
                        Foreground="{DynamicResource Labels.Foreground}" FontFamily="Roboto" FontWeight="Bold"
                        Focusable="False">
                 <Run
