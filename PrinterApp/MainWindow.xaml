@@ -59,11 +59,11 @@
                 <Run Text="3) Получи комбинацию цифр для печати документа. " /><LineBreak />
                 <Run Text="4) Введи комбинацию в окно ввода на компьютере бесплатного принтера" />
             </TextBlock>
-            <TextBlock FontSize="68" Width="400" Height="100" Canvas.Left="930" Canvas.Top="660" TextWrapping="Wrap"
+            <TextBlock FontSize="68" Width="800" Height="100" Canvas.Left="750" Canvas.Top="660" TextWrapping="Wrap"
                        Foreground="{DynamicResource Labels.Foreground}" FontFamily="Roboto" FontWeight="Bold"
                        Focusable="False">
                 <Run
-                    Text="С 8 Марта!" />
+                    Text="Девушки, с 8 Марта!" />
                 <LineBreak />
             </TextBlock>
             <!-- <TextBlock Text="Приложение Твой ФФ!" FontSize="24" Width="256" Height="28" Canvas.Left="854"
