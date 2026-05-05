@@ -450,113 +450,120 @@ public class PrinterModel
     {
         Log.Information("=== [WEBSOCKET START] ===");
         Log.Information($"[WEBSOCKET] Target URL: {WebSockUrl}");
-        
-        var socket = new ClientWebSocket();
-        
-        try
+        _socketClose = false;
+
+        while (!_socketClose)
         {
-            Log.Information($"[WEBSOCKET] Authorization header: {_httpClient.DefaultRequestHeaders.Authorization}");
-            socket.Options.SetRequestHeader("Authorization",
-                _httpClient.DefaultRequestHeaders.Authorization!.ToString());
-            
-            Log.Information("[WEBSOCKET] Attempting connection...");
-            
-            // Добавим timeout
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            await socket.ConnectAsync(new Uri(WebSockUrl), cts.Token);
-            
-            Log.Information($"[WEBSOCKET] Connected! State: {socket.State}");
-            
-            if (socket.State != WebSocketState.Open)
+            var socket = new ClientWebSocket();
+            try
             {
-                Log.Error($"[WEBSOCKET] *** STATE IS NOT OPEN: {socket.State} ***");
-                Marketing.SocketException(
-                    status: $"WebSocketState not Open state:{socket.State}");
+                await RunSocketSessionAsync(socket);
+                if (_socketClose) break;
+            }
+            catch (OperationCanceledException timeoutEx)
+            {
+                Log.Error("[WEBSOCKET] *** TIMEOUT EXCEPTION ***");
+                Log.Error($"[WEBSOCKET] Message: {timeoutEx.Message}");
+                Marketing.SocketException(status: $"Timeout: {timeoutEx.Message}");
+                socket.Abort();
+            }
+            catch (WebSocketException wsEx)
+            {
+                Log.Error("[WEBSOCKET] *** WEBSOCKET EXCEPTION ***");
+                Log.Error($"[WEBSOCKET] Type: {wsEx.GetType().Name}");
+                Log.Error($"[WEBSOCKET] Message: {wsEx.Message}");
                 Log.Error(
-                    $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: WebSocketState not Open state:{socket.State}");
-                return;
+                    $"[WEBSOCKET] Inner: {wsEx.InnerException?.GetType().Name} {wsEx.InnerException?.Message}");
+                Marketing.SocketException(status: wsEx.Message);
+                socket.Abort();
             }
-
-            Log.Information("[WEBSOCKET] Socket state is OPEN, starting message loop...");
-            Marketing.SocketConnected();
-            _socketClose = false;
-            var buffer = new byte[128 * 1024];
-            
-            while (!_socketClose)
+            catch (Exception exception)
             {
-                Log.Debug("[WEBSOCKET] Waiting for message...");
-                var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer),
-                    CancellationToken.None);
-                
-                Log.Debug($"[WEBSOCKET] Received {result.Count} bytes, EndOfMessage: {result.EndOfMessage}");
-                
-                var json = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                Log.Debug($"[WEBSOCKET] Message content: {json}");
-                
-                if (!result.EndOfMessage)
-                {
-                    Thread.Sleep(100);
-                    result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer),
-                        CancellationToken.None);
-                    json += Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    Log.Debug($"[WEBSOCKET] Combined message: {json}");
-                }
-
-                await ParseResponseFromSocket(
-                    JsonConvert.DeserializeObject<WebsocketReceiveOptions>(json));
+                Log.Error("[WEBSOCKET] *** GENERAL EXCEPTION ***");
+                Log.Error($"[WEBSOCKET] Type: {exception.GetType().Name}");
+                Log.Error($"[WEBSOCKET] Message: {exception.Message}");
+                Log.Error(
+                    $"[WEBSOCKET] Inner: {exception.InnerException?.GetType().Name} {exception.InnerException?.Message}");
+                Marketing.SocketException(status: exception.Message);
+                PrinterViewModel.PrintQr = null!;
+                socket.Abort();
+            }
+            finally
+            {
+                socket.Dispose();
             }
 
+            if (_socketClose) break;
+            Log.Information("[WEBSOCKET] Reconnecting in 5 seconds...");
+            await Task.Delay(5000);
+        }
+
+        Log.Information("=== [WEBSOCKET END] ===");
+    }
+
+    private async Task RunSocketSessionAsync(ClientWebSocket socket)
+    {
+        Log.Information(
+            $"[WEBSOCKET] Authorization header: {_httpClient.DefaultRequestHeaders.Authorization}");
+        socket.Options.SetRequestHeader("Authorization",
+            _httpClient.DefaultRequestHeaders.Authorization!.ToString());
+
+        Log.Information("[WEBSOCKET] Attempting connection...");
+
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        await socket.ConnectAsync(new Uri(WebSockUrl), cts.Token);
+
+        Log.Information($"[WEBSOCKET] Connected! State: {socket.State}");
+
+        if (socket.State != WebSocketState.Open)
+        {
+            Log.Error($"[WEBSOCKET] *** STATE IS NOT OPEN: {socket.State} ***");
+            Marketing.SocketException(
+                status: $"WebSocketState not Open state:{socket.State}");
+            return;
+        }
+
+        Log.Information("[WEBSOCKET] Socket state is OPEN, starting message loop...");
+        Marketing.SocketConnected();
+        var buffer = new byte[128 * 1024];
+
+        while (!_socketClose)
+        {
+            var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer),
+                CancellationToken.None);
+
+            Log.Information(
+                $"[WEBSOCKET] Received {result.Count} bytes, type={result.MessageType}, EndOfMessage={result.EndOfMessage}");
+
+            if (result.MessageType == WebSocketMessageType.Close)
+            {
+                Log.Warning(
+                    $"[WEBSOCKET] Server sent Close frame: status={result.CloseStatus}, description={result.CloseStatusDescription}");
+                break;
+            }
+
+            var json = Encoding.UTF8.GetString(buffer, 0, result.Count);
+            Log.Information($"[WEBSOCKET] Message content: {json}");
+
+            if (!result.EndOfMessage)
+            {
+                Thread.Sleep(100);
+                result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer),
+                    CancellationToken.None);
+                json += Encoding.UTF8.GetString(buffer, 0, result.Count);
+                Log.Information($"[WEBSOCKET] Combined message: {json}");
+            }
+
+            await ParseResponseFromSocket(
+                JsonConvert.DeserializeObject<WebsocketReceiveOptions>(json));
+        }
+
+        if (socket.State == WebSocketState.Open)
+        {
             Log.Information("[WEBSOCKET] Closing connection...");
             await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Good Bye",
                 CancellationToken.None);
             Log.Information("[WEBSOCKET] Closed successfully");
-        }
-        catch (OperationCanceledException timeoutEx)
-        {
-            Log.Error("[WEBSOCKET] *** TIMEOUT EXCEPTION ***");
-            Log.Error($"[WEBSOCKET] Message: {timeoutEx.Message}");
-            Log.Error($"[WEBSOCKET] Stack trace: {timeoutEx.StackTrace}");
-            _socketClose = true;
-            Marketing.SocketException(status: $"Timeout: {timeoutEx.Message}");
-            socket.Abort();
-        }
-        catch (WebSocketException wsEx)
-        {
-            Log.Error("[WEBSOCKET] *** WEBSOCKET EXCEPTION ***");
-            Log.Error($"[WEBSOCKET] Type: {wsEx.GetType().Name}");
-            Log.Error($"[WEBSOCKET] Message: {wsEx.Message}");
-            Log.Error($"[WEBSOCKET] Inner exception: {wsEx.InnerException?.GetType().Name}");
-            Log.Error($"[WEBSOCKET] Inner message: {wsEx.InnerException?.Message}");
-            Log.Error($"[WEBSOCKET] Stack trace: {wsEx.StackTrace}");
-            _socketClose = true;
-            Marketing.SocketException(status: wsEx.Message);
-            socket.Abort();
-            
-            Log.Information("[WEBSOCKET] Retrying in 5 seconds...");
-            await Task.Delay(5000);
-            SocketsStartAsync();
-        }
-        catch (Exception exception)
-        {
-            Log.Error("[WEBSOCKET] *** GENERAL EXCEPTION ***");
-            Log.Error($"[WEBSOCKET] Type: {exception.GetType().Name}");
-            Log.Error($"[WEBSOCKET] Message: {exception.Message}");
-            Log.Error($"[WEBSOCKET] Inner exception: {exception.InnerException?.GetType().Name}");
-            Log.Error($"[WEBSOCKET] Inner message: {exception.InnerException?.Message}");
-            Log.Error($"[WEBSOCKET] Stack trace: {exception.StackTrace}");
-            
-            _socketClose = true;
-            Marketing.SocketException(status: exception.Message);
-            PrinterViewModel.PrintQr = null!;
-            socket.Abort();
-            
-            Log.Information("[WEBSOCKET] Retrying in 5 seconds...");
-            await Task.Delay(5000);
-            SocketsStartAsync();
-        }
-        finally
-        {
-            Log.Information("=== [WEBSOCKET END] ===");
         }
     }
 
@@ -570,8 +577,10 @@ public class PrinterModel
 
         if (websocketReceiveOptions.Error != null && websocketReceiveOptions.Error != "")
         {
+            Log.Error($"[WEBSOCKET] Server returned error in payload: {websocketReceiveOptions.Error}");
             Marketing.SocketException(websocketReceiveOptions.Error);
             Close();
+            return;
         }
 
         if (websocketReceiveOptions.ManualUpdate)
@@ -647,18 +656,21 @@ public class PrinterModel
     {
         Log.Debug(
             $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: new qr code {value}");
-        try
+        Application.Current.Dispatcher.Invoke(() =>
         {
-            var image = _barcodeWriterGeometry.Write(value);
-            image.Freeze();
-            PrinterViewModel.PrintQr = image;
-        }
-        catch (Exception exception)
-        {
-            Log.Error(
-                $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
-            Marketing.QrGeneratorException(exception.ToString());
-            PrinterViewModel.PrintQr = null!;
-        }
+            try
+            {
+                var image = _barcodeWriterGeometry.Write(value);
+                image.Freeze();
+                PrinterViewModel.PrintQr = image;
+            }
+            catch (Exception exception)
+            {
+                Log.Error(
+                    $"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
+                Marketing.QrGeneratorException(exception.ToString());
+                PrinterViewModel.PrintQr = null!;
+            }
+        });
     }
 }
