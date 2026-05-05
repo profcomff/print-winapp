@@ -37,7 +37,7 @@ public class PrinterModel
     private const string HttpError = "Ошибка сети";
 
     private const string SumatraError =
-        "[Error] program SumatraPdf is not found\ninform the responsible person\n\n[Ошибка] программа SumatraPdf не найдена\nсообщите ответственному лицу";
+        "[Error] program SumatraPdf is not found\ninform the responsible person\n\n[Ошибка] программа SumatraPdf не найдена\nсообщите ответственному лицу.";
 
     private static readonly string SumatraPathSuffix =
         Path.DirectorySeparatorChar + "SumatraPDF" +
@@ -60,6 +60,8 @@ public class PrinterModel
 
     public PrinterModel(ConfigFile configFile, AutoUpdater autoUpdater)
     {
+        Log.Information("=== [CONSTRUCTOR START] PrinterModel initialization ===");
+        
         _configFile = configFile;
         _autoUpdater = autoUpdater;
 
@@ -71,40 +73,71 @@ public class PrinterModel
         _httpClient.DefaultRequestHeaders.Authorization
             = new AuthenticationHeaderValue(_configFile.AuthorizationToken);
 
+        Log.Information($"[CONSTRUCTOR] Token set: {_configFile.AuthorizationToken}");
+        Log.Information($"[CONSTRUCTOR] API URL: {ApiUrl}");
+
         try
         {
+            Log.Information($"[CONSTRUCTOR] Calling {ApiUrl}/auth/me");
             var response = _httpClient.GetAsync($"{ApiUrl}/auth/me");
             response.Wait(5000);
+            
+            Log.Information($"[CONSTRUCTOR] Response status code: {response.Result.StatusCode}");
             response.Result.EnsureSuccessStatusCode();
+            
             var responseBody = response.Result.Content.ReadAsStringAsync();
             responseBody.Wait(1000);
             var responceString = responseBody.Result;
+            
+            Log.Information($"[CONSTRUCTOR] Response body: {responceString}");
+            
             var htmlAttributes =
                 JsonConvert.DeserializeObject<Dictionary<string, string>>(responceString) ??
                 throw new InvalidOperationException();
-            Log.Information(htmlAttributes["id"]);
-            Marketing.TerminalUserId = htmlAttributes["id"];
+            
+            var terminalId = htmlAttributes["id"];
+            Log.Information($"[CONSTRUCTOR] Terminal ID: {terminalId}");
+            Marketing.TerminalUserId = terminalId;
         }
         catch (Exception e)
         {
-            Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {e}");
+            Log.Error($"[CONSTRUCTOR] *** AUTH FAILED ***");
+            Log.Error($"[CONSTRUCTOR] Exception type: {e.GetType().Name}");
+            Log.Error($"[CONSTRUCTOR] Exception message: {e.Message}");
+            Log.Error($"[CONSTRUCTOR] Inner exception: {e.InnerException}");
+            Log.Error($"[CONSTRUCTOR] Stack trace: {e.StackTrace}");
+            
             Marketing.TerminalUserIdError();
             MessageBox.Show(
                 "Терминал не смог получить id. Сообщите ответственному лицу. Перезапустите программу.",
                 "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             Close();
+            return;
         }
 
-
-        if (SearchSumatraPdf() == "")
+        Log.Information("[CONSTRUCTOR] Auth check passed");
+        Log.Information("[CONSTRUCTOR] Searching for SumatraPDF...");
+        
+        var sumatraPath = SearchSumatraPdf();
+        Log.Information($"[CONSTRUCTOR] SumatraPDF search result: '{sumatraPath}'");
+        
+        if (sumatraPath == "")
         {
+            Log.Error("[CONSTRUCTOR] *** SUMATRPDF NOT FOUND ***");
             MessageBox.Show(SumatraError);
             Close();
+            return;
         }
 
+        Log.Information($"[CONSTRUCTOR] SumatraPDF found at: {sumatraPath}");
+        Log.Information("[CONSTRUCTOR] Starting WebSocket connection...");
+        
         SocketsStartAsync();
 
+        Log.Information("[CONSTRUCTOR] Calling AsyncSaveScreen...");
         AsyncSaveScreen("LoadTerminal");
+        
+        Log.Information("=== [CONSTRUCTOR END] PrinterModel initialization completed ===");
     }
 
     ~PrinterModel()
@@ -114,30 +147,61 @@ public class PrinterModel
 
     private static void Close()
     {
+        Log.Information("[CLOSE] Closing application...");
         Log.CloseAndFlush();
         Environment.Exit(0);
     }
 
     private static string SearchSumatraPdf()
     {
+        Log.Debug("[SUMATRPDF] Starting search...");
+        
         var path =
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
             SumatraPathSuffix;
+        Log.Debug($"[SUMATRPDF] Checking: {path}");
         if (File.Exists(path))
+        {
+            Log.Information($"[SUMATRPDF] Found at LocalApplicationData: {path}");
             return path;
+        }
+        
         path = Directory.GetCurrentDirectory() + SumatraPathSuffix;
+        Log.Debug($"[SUMATRPDF] Checking: {path}");
         if (File.Exists(path))
+        {
+            Log.Information($"[SUMATRPDF] Found at CurrentDirectory: {path}");
             return path;
+        }
+        
         path = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "SumatraPDF.exe";
+        Log.Debug($"[SUMATRPDF] Checking: {path}");
         if (File.Exists(path))
+        {
+            Log.Information($"[SUMATRPDF] Found at CurrentDirectory root: {path}");
             return path;
+        }
+        
         path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) +
                SumatraPathSuffix;
+        Log.Debug($"[SUMATRPDF] Checking: {path}");
         if (File.Exists(path))
+        {
+            Log.Information($"[SUMATRPDF] Found at ProgramFiles: {path}");
             return path;
+        }
+        
         path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) +
                SumatraPathSuffix;
-        return File.Exists(path) ? path : "";
+        Log.Debug($"[SUMATRPDF] Checking: {path}");
+        if (File.Exists(path))
+        {
+            Log.Information($"[SUMATRPDF] Found at ProgramFilesX86: {path}");
+            return path;
+        }
+        
+        Log.Error("[SUMATRPDF] NOT FOUND in any location!");
+        return "";
     }
 
     private static void AsyncSaveScreen(string imageName = "")
@@ -384,14 +448,28 @@ public class PrinterModel
 
     private async void SocketsStartAsync()
     {
+        Log.Information("=== [WEBSOCKET START] ===");
+        Log.Information($"[WEBSOCKET] Target URL: {WebSockUrl}");
+        
         var socket = new ClientWebSocket();
-        socket.Options.SetRequestHeader("Authorization",
-            _httpClient.DefaultRequestHeaders.Authorization!.ToString());
+        
         try
         {
-            await socket.ConnectAsync(new Uri(WebSockUrl), CancellationToken.None);
+            Log.Information($"[WEBSOCKET] Authorization header: {_httpClient.DefaultRequestHeaders.Authorization}");
+            socket.Options.SetRequestHeader("Authorization",
+                _httpClient.DefaultRequestHeaders.Authorization!.ToString());
+            
+            Log.Information("[WEBSOCKET] Attempting connection...");
+            
+            // Добавим timeout
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            await socket.ConnectAsync(new Uri(WebSockUrl), cts.Token);
+            
+            Log.Information($"[WEBSOCKET] Connected! State: {socket.State}");
+            
             if (socket.State != WebSocketState.Open)
             {
+                Log.Error($"[WEBSOCKET] *** STATE IS NOT OPEN: {socket.State} ***");
                 Marketing.SocketException(
                     status: $"WebSocketState not Open state:{socket.State}");
                 Log.Error(
@@ -399,38 +477,86 @@ public class PrinterModel
                 return;
             }
 
+            Log.Information("[WEBSOCKET] Socket state is OPEN, starting message loop...");
             Marketing.SocketConnected();
             _socketClose = false;
             var buffer = new byte[128 * 1024];
+            
             while (!_socketClose)
             {
+                Log.Debug("[WEBSOCKET] Waiting for message...");
                 var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer),
                     CancellationToken.None);
+                
+                Log.Debug($"[WEBSOCKET] Received {result.Count} bytes, EndOfMessage: {result.EndOfMessage}");
+                
                 var json = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                Log.Debug($"[WEBSOCKET] Message content: {json}");
+                
                 if (!result.EndOfMessage)
                 {
                     Thread.Sleep(100);
                     result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer),
                         CancellationToken.None);
                     json += Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    Log.Debug($"[WEBSOCKET] Combined message: {json}");
                 }
 
                 await ParseResponseFromSocket(
                     JsonConvert.DeserializeObject<WebsocketReceiveOptions>(json));
             }
 
+            Log.Information("[WEBSOCKET] Closing connection...");
             await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Good Bye",
                 CancellationToken.None);
+            Log.Information("[WEBSOCKET] Closed successfully");
+        }
+        catch (OperationCanceledException timeoutEx)
+        {
+            Log.Error("[WEBSOCKET] *** TIMEOUT EXCEPTION ***");
+            Log.Error($"[WEBSOCKET] Message: {timeoutEx.Message}");
+            Log.Error($"[WEBSOCKET] Stack trace: {timeoutEx.StackTrace}");
+            _socketClose = true;
+            Marketing.SocketException(status: $"Timeout: {timeoutEx.Message}");
+            socket.Abort();
+        }
+        catch (WebSocketException wsEx)
+        {
+            Log.Error("[WEBSOCKET] *** WEBSOCKET EXCEPTION ***");
+            Log.Error($"[WEBSOCKET] Type: {wsEx.GetType().Name}");
+            Log.Error($"[WEBSOCKET] Message: {wsEx.Message}");
+            Log.Error($"[WEBSOCKET] Inner exception: {wsEx.InnerException?.GetType().Name}");
+            Log.Error($"[WEBSOCKET] Inner message: {wsEx.InnerException?.Message}");
+            Log.Error($"[WEBSOCKET] Stack trace: {wsEx.StackTrace}");
+            _socketClose = true;
+            Marketing.SocketException(status: wsEx.Message);
+            socket.Abort();
+            
+            Log.Information("[WEBSOCKET] Retrying in 5 seconds...");
+            await Task.Delay(5000);
+            SocketsStartAsync();
         }
         catch (Exception exception)
         {
+            Log.Error("[WEBSOCKET] *** GENERAL EXCEPTION ***");
+            Log.Error($"[WEBSOCKET] Type: {exception.GetType().Name}");
+            Log.Error($"[WEBSOCKET] Message: {exception.Message}");
+            Log.Error($"[WEBSOCKET] Inner exception: {exception.InnerException?.GetType().Name}");
+            Log.Error($"[WEBSOCKET] Inner message: {exception.InnerException?.Message}");
+            Log.Error($"[WEBSOCKET] Stack trace: {exception.StackTrace}");
+            
             _socketClose = true;
             Marketing.SocketException(status: exception.Message);
-            Log.Error($"{GetType().Name} {MethodBase.GetCurrentMethod()?.Name}: {exception}");
             PrinterViewModel.PrintQr = null!;
             socket.Abort();
+            
+            Log.Information("[WEBSOCKET] Retrying in 5 seconds...");
             await Task.Delay(5000);
             SocketsStartAsync();
+        }
+        finally
+        {
+            Log.Information("=== [WEBSOCKET END] ===");
         }
     }
 
